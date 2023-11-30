@@ -87,9 +87,9 @@
       <!-- Middle Column -->
       <div class="w3-col m9">
 
-      <div id="app">
+        <div id="app">
           <!-- Container for blog posts -->
-          <div id="blog-posts" class="container"></div>
+          <div id="blog-posts" class="container1"></div>
         </div>
 
         <!-- The Modal -->

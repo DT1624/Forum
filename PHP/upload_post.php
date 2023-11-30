@@ -28,7 +28,7 @@
             }
         }
 
-        $stmt = $conn->prepare("INSERT INTO posts (postID, userIDPost, groupIDPost, tittlePost, descriptionPost, imagePost) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO posts (postID, userIDPost, groupIDPost, titlePost, descriptionPost, imagePost) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssss", $postID, $userIDPost, $groupID, $post_title, $post_description, $file);
         $result = $stmt->execute();
 

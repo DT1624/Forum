@@ -5,8 +5,14 @@ if (isset($_SESSION['message'])) {
     echo "<script>alert('" . $_SESSION['message'] . "');</script>";
     unset($_SESSION['message']); // Xóa thông báo sau khi sử dụng
 }
-?>
-<?php
+    $userName = str_replace(' ', '', $_POST['username']);
+    if(strlen($userName) < 6) {
+        $_SESSION['message'] = "Tên đăng nhập yêu cầu tối thiểu 6 ký tự.";
+        echo "<script>registerForm();</script>";
+        header("Location: index.php");
+        exit();
+    }
+    
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (session_status() == PHP_SESSION_NONE) {
         session_start();

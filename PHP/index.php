@@ -46,7 +46,7 @@ session_destroy();
                 <input class="input" type="text" id="lastname" name="lastname">
 
                 <label class="label" for="username">Username</label>
-                <input class="input" type="text" id="username" name="username" required>
+                <input class="input" type="text" id="username" name="username" minlength="6" required>
 
                 <label class="label" for="password">Password</label>
                 <input class="input" type="password" id="password" name="password" required>
@@ -80,6 +80,9 @@ session_destroy();
     </div>
 
     <script src="script.js"></script>
+    <script>
+        
+    </script>
 </body>
 
 </html>

@@ -6,5 +6,6 @@
 // Query to get posts from the database
 echo $userIDNotice;
 
+
 // Fetch posts as an associative array
 ?>

@@ -1,0 +1,44 @@
+<?php
+// Assuming you have a database connection already established
+$servername = "your_servername";
+$username = "your_username";
+$password = "your_password";
+$dbname = "your_database";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// SQL statement to get userID
+$userIDQuery = "SELECT userID FROM users WHERE userID = 'ID03307499'";
+$userIDResult = $conn->query($userIDQuery);
+
+if ($userIDResult->num_rows > 0) {
+    $row = $userIDResult->fetch_assoc();
+    $userIDInteracted = $row['userID'];
+
+    // SQL statement to get userName
+    $userNameQuery = "SELECT fullName FROM users WHERE userID = '$userIDInteracted'";
+    $userNameResult = $conn->query($userNameQuery);
+
+    if ($userNameResult->num_rows > 0) {
+        $row = $userNameResult->fetch_assoc();
+        $userName = $row['fullName'];
+
+        // Now $userIDInteracted and $userName contain the desired values
+        echo "userIDInteracted: " . $userIDInteracted . "<br>";
+        echo "userName: " . $userName . "<br>";
+    } else {
+        echo "No records found for userName";
+    }
+} else {
+    echo "No records found for userID";
+}
+
+// Close connection
+$conn->close();
+?>

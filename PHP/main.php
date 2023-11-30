@@ -31,7 +31,7 @@ if (isset($_SESSION['message'])) {
 
         <!-- Thêm các trường đăng ký cần thiết vào đây -->
         <div class = "input-group">
-            <input class = "input" type="text" id="username" name="username" required><br>
+            <input class = "input" type="text" id="username" name="username" oninput="validUserName(this)" required><br>
             <label class = "label" for="username">Username</label>
         </div>
         
@@ -59,6 +59,9 @@ function validateYear(input) {
         input.value = ''; // Xóa giá trị không hợp lệ
     }
 }
+
+
+
 </script>
 </body>
 </html>

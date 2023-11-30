@@ -1,26 +1,32 @@
+<?php
+
+require_once("connection.php");
+    include 'comments.inc.php';
+?>
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset = "UTF-8">
+<title>Title of the document</title>
+<link rel = "stylesheet" type = "text/css" href = "style.css">
 </head>
+
 <body>
-    <!-- Button to open the edit profile modal -->
-    <button id="editProfileBtn">Edit Profile</button>
 
-    <!-- The modal -->
-    <div id="editProfileModal" class="modal">
-        <div class="modal-content">
-            <!-- Your edit profile form goes here -->
-            <span class="close">&times;</span>
-            <h2>Edit Profile</h2>
-            <!-- Add your form elements for editing personal information -->
-        </div>
-    </div>
+<?php
+echo "<form method = 'POST' action = '".setComments($conn)."'>
+    <input type = 'hidden' name = 'uid' value = 'Anonymous'>
+    <input type = 'hidden' name = 'date' value = '".date('Y-m-d H:i:s')."'>
+    <textarea name = 'message'></textarea><br>
+    <button type = 'submit' name = 'commentSubmit'>Comment</button>
+</form>";
 
-    <!-- Include your script at the end of the body to ensure all elements are available -->
-    <script src="script.js"></script>
+getComments($conn);
+?>
+
 </body>
+
+</head>
 </html>
