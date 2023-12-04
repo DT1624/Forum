@@ -1,11 +1,21 @@
 <?php
-session_start();
-
-if (isset($_SESSION['message'])) {
-  echo "<script>alert('" . $_SESSION['message'] . "');</script>";
-  unset($_SESSION['message']); // Xóa thông báo sau khi sử dụng
-}
-// session_destroy();
+  session_start();
+  require_once("connection.php");
+  if (isset($_SESSION['message'])) {
+    echo "<script>alert('" . $_SESSION['message'] . "');</script>";
+    unset($_SESSION['message']); // Xóa thông báo sau khi sử dụng
+  }
+  $categoryGroup='';
+  if (isset($_GET['category'])) {
+    $categoryGroup = $_GET['category'];
+  }
+  $_SESSION['category'] = $categoryGroup;
+  $userID = $_SESSION['userID'];
+  $sql = "SELECT * FROM users WHERE userID = '$userID'";
+  $result = $conn->query($sql);
+  $userInfo = $result->fetch_assoc();
+  
+  $_SESSION['wherePost'] = "forum";
 ?>
 <!DOCTYPE html>
 <html>
@@ -35,64 +45,13 @@ if (isset($_SESSION['message'])) {
 </head>
 
 <body class="w3-theme-l5">
-  <div class="w3-modal" id="post-modal">
-    <div class="w3-modal-content">
-
-      <div class="w3-container w3-padding">
-        <span class="w3-right w3-opacity"><i class="fa fa-times" onclick="document.getElementById('post-modal').style.display='none'"></i></span>
-        <form class="form1" action="upload_post.php" method="post" enctype="multipart/form-data">
-          <label class="label1" for="post_title">Title:</label>
-          <input class="input1" type="text" name="post_title" placeholder="Title" required><br>
-
-          <label class="label1" for="post_description">Description:</label>
-          <textarea class="myTexttarea" id="myTextarea" name="post_description" required></textarea><br>
-
-          <label class="label1" for="group_post">Group:</label><br>
-          <?php
-          require_once("connection.php");
-          $sql = "SELECT groupID, categoryGroup FROM groupss";
-          $result = $conn->query($sql);
-
-          if ($result->num_rows > 0) {
-            echo '<select id="group" name="select_group">';
-
-            while ($row = $result->fetch_assoc()) {
-              $groupID = htmlspecialchars($row["groupID"]);
-              $categoryGroup = htmlspecialchars($row["categoryGroup"]);
-              echo '<option value="' . $groupID . '">' . $categoryGroup . '</option>';
-            }
-
-            echo '</select>';
-          } else {
-            echo "No data found";
-          }
-          ?>
-
-          <br><br><label class="label1" for="file">Upload Image:</label>
-          <input class="input1" type="file" name="file" accept="image/*"><br>
-
-          <button class="button1">Upload</button>
-        </form>
-      </div>
-
-    </div>
-  </div>
-  <!-- <div class="w3-modal" id="post-modal">
-    <div class="w3-modal-content">
-      <div class="w3-container w3-padding">
-        <span class="w3-right w3-opacity"><i class="fa fa-times"
-            onclick="document.getElementById('post-modal').style.display='none'"></i></span>
-        <h3>ĐĂNG BÀI</h3>
-        <label for="">Tiêu đề: <input class="w3-input w3-border w3-padding" type="text" id="post-title-inp"></label><br>
-        <label for="">Link ảnh: <input class="w3-input w3-border w3-padding" type="text" id="post-img-inp"
-            style="margin-bottom: 20px;"></label>
-        <label for="">Nội dung: <br>
-          <textarea id="post-content-inp" cols="102" rows="10" class="w3-border w3-padding"></textarea>
-          <button class="w3-button w3-theme" style="margin-top:20px;" onclick="dangBai()">Đăng
-            bài</button><br>
-      </div>
-    </div>
-  </div> -->
+  <!-- Khung đăng bài -->
+  <?php
+    require_once("comments.inc.php");
+    require_once("connection.php");
+    upPostForum($conn, "forum.php");
+  ?>  
+  
   <!-- Navbar -->
   <div class="w3-top">
     <div class="w3-bar w3-theme-d2 w3-left-align w3-large">
@@ -112,7 +71,7 @@ if (isset($_SESSION['message'])) {
         <button class="" type="submit"><i class="fa fa-search"></i></button>
       </form>
       <a href="#" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="My Account" onclick="clickProfile()">
-        <img src="uploads/anonymous.png" class="w3-circle" style="height:25px;width:auto" alt="Avatar">
+        <img src="<?php echo $userInfo['linkAva'] ?>" class="w3-circle" style="height:25px;width:auto" alt="Avatar">
       </a>
       <a href="logout.php" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white w3-right" title="Messages">Sign out<i class="fa fa-sign-out"></i></a>
     </div>
@@ -125,45 +84,59 @@ if (isset($_SESSION['message'])) {
       <!-- Left Column -->
       <div class="w3-col m3">
         <!-- Profile -->
-        <div class="w3-card w3-round w3-white">
+        <!-- <div class="w3-card w3-round w3-white">
           <div class="w3-container">
-            <h4 class="w3-center">My Profile</h4>
-            <p class="w3-center"><img src="uploads/anonymous.png" class="w3-circle" style="height:106px;width:auto" alt="Avatar"></p>
-            <hr>
-            <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i> Designer, UI</p>
-            <p><i class="fa fa-home fa-fw w3-margin-right w3-text-theme"></i> London, UK</p>
-            <p><i class="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i> April 1, 1988</p>
+              <h4 class="w3-center">User Profile</h4>
+              <p class="w3-center"><img src="<?php echo $userInfo['linkAva']; ?>" class="w3-circle" style="height:106px;width:auto" alt="Avatar"></p>
+              <hr>
+              <p><i class="fa fa-user fa-fw w3-margin-right w3-text-theme"></i><?php echo $userInfo['fullName']; ?></p>
+              <p><i class="fa fa-user fa-fw w3-margin-right w3-text-theme"></i><?php echo $userInfo['userName']; ?></p>
+              <p><i class="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i><?php echo $userInfo['birthday']; ?></p>
+              <p><i class="fa fa-venus-mars fa-fw w3-margin-right w3-text-theme"></i><?php echo $userInfo['gender']; ?></p>
+              <p><i class="fa fa-users fa-fw w3-margin-right w3-text-theme"></i>Followers: <?php echo $userInfo['followers']; ?></p>
           </div>
-        </div>
+        </div> -->
+        
         <br>
 
-        <!-- Accordion -->
         <div class="w3-card w3-round">
           <div class="w3-white">
-            <button onclick="myFunction('Demo1')" class="w3-button w3-block w3-theme-l1 w3-left-align"><i class="fa fa-circle-o-notch fa-fw w3-margin-right"></i> Gần đây</button>
-            <button onclick="myFunction('Demo2')" class="w3-button w3-block w3-theme-l1 w3-left-align"><i class="fa fa-calendar-check-o fa-fw w3-margin-right"></i> Group1</button>
-            <button onclick="myFunction('Demo3')" class="w3-button w3-block w3-theme-l1 w3-left-align"><i class="fa fa-users fa-fw w3-margin-right"></i> Group2</button>
-            <button onclick="myFunction('Demo4')" class="w3-button w3-block w3-theme-l1 w3-left-align"><i class="fa fa-users fa-fw w3-margin-right"></i> Group3</button>
+            <?php
+              require_once("comments.inc.php");
+              require_once("connection.php");
+              loadGroup($conn);
+            ?>  
+            <!-- <button onclick="myFunction('Demo1')" class="w3-button w3-block w3-theme-l1 w3-left-align"><i class="fa fa-history fa-fw w3-margin-right"></i> Gần đây</button>
+            <button onclick="myFunction('Demo2')" class="w3-button w3-block w3-theme-l1 w3-left-align"><i class="fa fa-calendar-plus-o fa-fw w3-margin-right"></i> Group1</button>
+            <button onclick="myFunction('Demo3')" class="w3-button w3-block w3-theme-l1 w3-left-align"><i class="fa fa-group fa-fw w3-margin-right"></i> Group2</button>
+            <button onclick="myFunction('Demo4')" class="w3-button w3-block w3-theme-l1 w3-left-align"><i class="fa fa-user fa-fw w3-margin-right"></i> Group3</button> -->
           </div>
         </div>
         <br>
-        <!-- End Left Column -->
       </div>
       
       <!-- Middle Column -->
       <div class="w3-col m9">
 
         <div id="app">
-          <!-- Container for blog posts -->
           <div id="blog-posts" class="container1"></div>
         </div>
 
-        <!-- The Modal -->
-        <div id="myModal" class="modal">
+        <div id="myModal" class="modal1">
           <span id="closeBtn" class="close">&times;</span>
           <img id="modalImage" class="modal-content">
         </div>
-
+        <!-- <div id="app">
+        <?php
+          require_once("comments.inc.php");
+          require_once("connection.php");
+          getPosts($conn, $userID);
+        ?>
+        </div>
+          <div id="myModal" class="modal1">
+        <span id="closeBtn" class="close">&times;</span>
+        <img id="modalImage" class="modal-content">
+      </div> -->
 
         <button type="button" class="w3-button w3-theme-d1" style="padding:0 5px 0 5px;margin:1px 1px 1px 16px;display: inline-block;"> 1</button>
         <button type="button" class="w3-button w3-theme-d1" style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 2</button>

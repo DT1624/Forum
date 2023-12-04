@@ -7,13 +7,13 @@ document.addEventListener("DOMContentLoaded", function () {
         // Create a post container
         const postContainer = document.createElement("div");
         postContainer.classList.add("post");
-
+        const imageHtml = post.imagePost ? `<p style="text-align: center"><img class="post-image" src="${post.imagePost}" alt="Post Image"></p>`: ``;
         // Create post content
         const postContent = `
             <div>
                 <p style="text-align: right; font-size: small; font-weight: 700"><i>${post.dateOfPost}</i></p>
                 <h1><i>${post.titlePost}<i></h1>
-                <p style="text-align: center"><img class="post-image" src="${post.imagePost}" alt="Post Image"></p>
+                ${imageHtml}                
                 <div class="description-container">
                     <p>${post.descriptionPost}</p>
                 </div>
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="like-container" id="likeContainer_${post.postID}">
                         <span class="reaction-count">${post.numberReactions}</span>
                         <div class="like-button" id="likeButton_${post.postID}" onclick="handleLike(${post.postID})">
-                            <span class="icon">❤️</span>
+                            <span class="like-button">❤️</span>
                         </div>
                     </div>
                     <div class="comment-container">
@@ -53,6 +53,11 @@ document.addEventListener("DOMContentLoaded", function () {
         commentButton.addEventListener('click', () => {
             handleComment(post.postID);
         });
+
+        const likeButton = postContainer.querySelector('.like-button');
+        likeButton.addEventListener('click', () => {
+            handleLike(post.postID);
+        });
     }
 
 
@@ -81,14 +86,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Wait for the image to load before calculating its dimensions
         modalImg.onload = function () {
-            // Calculate the position to center the image
-            const topPosition = Math.max(0, (window.innerHeight - modalImg.height) / 2);
-            const leftPosition = Math.max(0, (window.innerWidth - modalImg.width) / 2);
-
-            // Set the position and display the modal
             modal.style.display = 'block';
-            modal.style.top = topPosition + 'px';
-            modal.style.left = leftPosition + 'px';
+            modal.style.top = '0px';
+            modal.style.left = '0px';
+            //modal.style.transform = 'translate(-50%, -50%)';
+           // modalImg.style.top = '50px';
+
         };
 
         closeBtn.addEventListener('click', closeModal);
@@ -109,29 +112,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function handleLike(postId) {
         const likedIndex = likedPostIds.indexOf(postId);
-
+        require_once("connection.php");
+    
         if (likedIndex === -1) {
             likedPostIds.push(postId);
+            updateReactions(postId, 1); // Tăng giá trị reactions lên 1
         } else {
             likedPostIds.splice(likedIndex, 1);
+            updateReactions(postId, -1); // Giảm giá trị reactions đi 1
         }
-
+    
         updateLikeStatus(postId);
-        // Additional logic or API call to handle the like action
     }
-
-    function updateLikeStatus(postId) {
-        const likeButton = document.getElementById(`likeButton_${postId}`);
-        const likeContainer = document.getElementById(`likeContainer_${postId}`);
-        const isLiked = likedPostIds.includes(postId);
-
-        if (isLiked) {
-            likeButton.classList.add('active');
-            likeContainer.classList.add('active');
-        } else {
-            likeButton.classList.remove('active');
-            likeContainer.classList.remove('active');
-        }
+    
+    function updateReactions(postId, value) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "forum.php", true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.send(`postId=${postId}&value=${value}`);
     }
 
     function handleComment(postId) {

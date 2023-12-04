@@ -39,7 +39,7 @@ function dangBai() {
         title +
         "&imagelink=" +
         imagelink +
-        "&content=" +
+        "&content=" +   
         content
     );
     window.location.href = "forum.html";
@@ -116,7 +116,7 @@ function displayPersonalInformation() {
 }
 
 function clickProfile() {
-    window.location.href = "profile.php";
+    window.location.href = `profile.php`;
 }
 
 function editprofile() {

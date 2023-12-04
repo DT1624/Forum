@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt = $conn->prepare("INSERT INTO personalusers (userIDpersonal, isLogin) VALUES (?, ?)");
             $stmt->bind_param("si", $_SESSION['userID'], $isLogin);
             $result3 = $stmt->execute();
-            header("Location: forum.php");
+            header("Location: forum.php?category=recently");
         } else {
             $_SESSION['message'] = "Sai mật khẩu";
             $_SESSION["loginSucces"] = true;

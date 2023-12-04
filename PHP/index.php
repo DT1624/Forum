@@ -55,9 +55,9 @@ session_destroy();
                 <input class="input" type="date" id="birthday" name="birthday" max="2026-01-01" min="1950-01-01" oninput="validateYear(this)" required>
 
                 <select id="gender" name="gender">
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
                 </select>
 
                 <br><input class="input" type="submit" value="Đăng Ký">

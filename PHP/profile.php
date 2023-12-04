@@ -1,3 +1,17 @@
+<?php
+session_start();
+require_once("connection.php");
+$userID = $_SESSION['userID'];
+$sql = "SELECT * FROM users WHERE userID = '$userID'";
+$result = $conn->query($sql);
+$userInfo = $result->fetch_assoc();
+$userIDNow = $userID;
+if (isset($_GET['userIDNow'])) {
+  $userIDNow = $_GET['userIDNow'];
+  $_SESSION['usserIDNow'] = $userIDNow;
+}
+$_SESSION['wherePost'] = "profile";
+?>
 <!DOCTYPE html>
 <html>
 
@@ -10,6 +24,7 @@
   <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="icon" type="image/x-icon" href="https://cdn.haitrieu.com/wp-content/uploads/2021/10/Logo-DH-Cong-Nghe-UET.png">
+  <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="post.css">
   <style>
     html,
@@ -25,21 +40,13 @@
 </head>
 
 <body class="w3-theme-l5">
-  <div class="w3-modal" id="post-modal">
-    <div class="w3-modal-content">
-      <div class="w3-container w3-padding">
-        <span class="w3-right w3-opacity"><i class="fa fa-times" onclick="document.getElementById('post-modal').style.display='none'"></i></span>
-        <h3>ĐĂNG BÀI</h3>
-        <label for="">Tiêu đề: <input class="w3-input w3-border w3-padding" type="text" id="post-title-inp"></label><br>
-        <label for="">Link ảnh: <input class="w3-input w3-border w3-padding" type="text" id="post-img-inp" style="margin-bottom: 20px;"></label>
-        <label for="">Nội dung: <br>
-          <!-- <input class="w3-input" type="text" id="post-content-inp" style="height: 30vh;"></label> -->
-          <textarea id="post-content-inp" cols="102" rows="10" class="w3-border w3-padding"></textarea>
-          <button class="w3-button w3-theme" style="margin-top:20px;" onclick="dangBai()">Đăng
-            bài</button><br>
-      </div>
-    </div>
-  </div>
+  <!-- Khung đăng bài -->
+  <?php
+    require_once("comments.inc.php");
+    require_once("connection.php");
+    upPostForum($conn, "profile.php");
+  ?>  
+
   <!-- Navbar -->
   <div class="w3-top">
     <div class="w3-bar w3-theme-d2 w3-left-align w3-large">
@@ -52,14 +59,17 @@
           <a href="#" class="w3-bar-item w3-button">One new friend request</a>
           <a href="#" class="w3-bar-item w3-button">John Doe posted on your wall</a>
           <a href="#" class="w3-bar-item w3-button">Jane likes your post</a>
+          <a href="#" class="w3-bar-item w3-button">XIn chào</a>
         </div>
       </div>
       <form class="w3-margin-left w3-bar-item" action="/action_page.php">
         <input class="" type="text" placeholder="Search.." name="search">
         <button class="" type="submit"><i class="fa fa-search"></i></button>
       </form>
-      <a href="#" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="My Account">
-        <img src="/w3images/avatar2.png" class="w3-circle" style="height:23px;width:23px" alt="Avatar">
+      <a href="#" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" style="height:auto" title="My Account" onclick="clickProfile()">
+        <img src="<?php echo $userInfo['linkAva'] ?>"style="height:23px;width:23px;border-radius: 50%; object-fit: cover;display: flex;
+        flex-direction: row;
+        align-items: center;text-align: center;" alt="Avatar">
       </a>
       <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white w3-right" title="Messages"><i class="fa fa-sign-out"></i></a>
     </div>
@@ -68,36 +78,36 @@
   <!-- Page Container -->
   <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px">
     <div class="w3-row">
-      <div class="w3-col m3">
-        <div class="w3-card w3-round w3-white">
-          <div class="w3-container">
-            <h4 class="w3-center">My Profile</h4>
-            <p class="w3-center"><img src="/w3images/avatar3.png" class="w3-circle" style="height:106px;width:106px" alt="Avatar"></p>
-            <hr>
-            <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i> Designer, UI</p>
-            <p><i class="fa fa-home fa-fw w3-margin-right w3-text-theme"></i> London, UK</p>
-            <p><i class="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i> April 1, 1988</p>
-          </div>
-        </div>
-        <button type="button" class="w3-button w3-theme" style="margin-top:20px;" onclick="editprofile()">Edit profile</button>
+      <div class="w3-col m3" style="display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    width: 250;
+                                    margin-top: 20px;">
+        <?php
+        require_once("comments.inc.php");
+        displayUserProfile($conn, $userID, $userIDNow);
+        ?>
+        
         <br>
       </div>
 
-      <!-- <div id="profile"></div> -->
-      <!-- Middle Column -->
-      <div class="w3-col m9">
+      <!-- <div class="w3-col m9">
+        <div id="myModal" class="modal">
+          <span id="closeBtn" class="close">&times;</span>
+          <img id="modalImage" class="modal-content">
+        </div>
+      </div> -->
 
+      <div class="w3-col m9">
         <div id="app">
           <!-- Container for blog posts -->
           <div id="blog-posts" class="container1"></div>
         </div>
 
-        <!-- The Modal -->
-        <div id="myModal" class="modal">
+        <div id="myModal" class="modal1">
           <span id="closeBtn" class="close">&times;</span>
           <img id="modalImage" class="modal-content">
         </div>
-
 
         <button type="button" class="w3-button w3-theme-d1" style="padding:0 5px 0 5px;margin:1px 1px 1px 16px;display: inline-block;"> 1</button>
         <button type="button" class="w3-button w3-theme-d1" style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 2</button>
@@ -127,17 +137,18 @@
   <script src="app.js"></script>
   <script>
     function editprofile() {
-      window.location.href = "editProfile.php";
+      window.location.href = "editProfile.php?userId=<?php echo $userID; ?>";
     }
+
     function clickLogo() {
-      window.location.href = "forum.php";
+      window.location.href = "forum.php?category=recently";
     }
     window.onload = function() {
       displayProfile();
     };
   </script>
-  
-  
+
+
 
 </body>
 

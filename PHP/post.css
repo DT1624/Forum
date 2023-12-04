@@ -37,13 +37,15 @@ hr {
 }
 
 /* Các quy tắc CSS cho modal */
-.modal {
+.modal1 {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    align-items: center;
+    margin-left: 0px;
+    width: 80%;
+    height: 80%;
+     margin-top: 5%; 
+    margin-left: 10%;
     background-color: rgba(0, 0, 0, 0.7);
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -52,9 +54,10 @@ hr {
 
 .modal-content {
     display: block;
-    margin: 20px auto;
+    margin: auto; 
     max-width: 100%;
     max-height: 100%;
+    border-radius: 5%;
 }
 
 .modal img {
@@ -82,7 +85,7 @@ hr {
     text-align: justify;
 }
 
-.reaction-comment-container {
+.reaction-comment-container, .button-container {
     display: flex;
     justify-content: space-between;
     align-items: center;

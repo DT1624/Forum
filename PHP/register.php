@@ -6,8 +6,15 @@ if (isset($_SESSION['message'])) {
     unset($_SESSION['message']); // Xóa thông báo sau khi sử dụng
 }
     $userName = str_replace(' ', '', $_POST['username']);
+    $password = $_POST['password'];
     if(strlen($userName) < 6) {
         $_SESSION['message'] = "Tên đăng nhập yêu cầu tối thiểu 6 ký tự.";
+        echo "<script>registerForm();</script>";
+        header("Location: index.php");
+        exit();
+    }
+    if(strlen($password) < 6) {
+        $_SESSION['message'] = "Mật khẩu cần ít nhất 6 ký tự.";
         echo "<script>registerForm();</script>";
         header("Location: index.php");
         exit();
