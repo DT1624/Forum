@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     const likedPostIds = [];
 
     function renderPost(post) {
@@ -62,18 +62,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // Render each blog post
-    fetch('get_posts.php')
-        .then(response => response.json())
-        .then(postsData => {
-            const blogPostsContainer = document.getElementById("blog-posts");
-            postsData.forEach(post => {
+    // fetch('get_posts.php')
+    //     .then(response => response.json())
+    //     .then(postsData => {
+    //         const blogPostsContainer = document.getElementById("blog-posts");
+    //         postsData.forEach(post => {
+    //             renderPost(post);
+    //             // Add a separator (hr) between posts for better visual separation
+    //             const separator = document.createElement("hr");
+    //             blogPostsContainer.appendChild(separator);
+    //         });
+    //     })
+    //     .catch(error => console.error('Error fetching posts:', error));
+
+    async function fetchPosts() {
+        try {
+            const response = await fetch('get_posts.php');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const postsData = await response.json();
+
+            // Sử dụng map thay vì forEach để giữ lại mảng sau khi render
+            const renderedPosts = postsData.map(post => {
                 renderPost(post);
-                // Add a separator (hr) between posts for better visual separation
+                return post;
+            });
+
+            // Thêm separator sau mỗi bài viết trừ bài viết cuối cùng
+            renderedPosts.slice(0, -1).forEach(() => {
                 const separator = document.createElement("hr");
                 blogPostsContainer.appendChild(separator);
             });
-        })
-        .catch(error => console.error('Error fetching posts:', error));
+
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+        }
+    }
+
+    // Gọi hàm fetchPosts để lấy và hiển thị bài viết
+    await fetchPosts();
 
 
     // Modal functions

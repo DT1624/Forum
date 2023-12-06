@@ -29,7 +29,27 @@ function validateYear(input) {
     const year = input.value.split('-')[0];
     if (year.length !== 4) {
         alert("Vui lòng nhập đúng 4 chữ số cho năm.");
-        input.value = ''; 
+        input.value = '';
     }
 }
+
+function openPostModal() {
+    document.getElementById("post-modal").style.display = "block";
+}
+
+function editprofile(userID) {
+    window.location.href = "editProfile.php?userId="+ userID;
+}
+
+
+function clickLogo() {
+    window.location.href = "forum.php?category=recently";
+}
+
+function clickPost(postID) {
+    window.location.href = "indexCom.php?postId=" + postID;
+}
+
+
+
 

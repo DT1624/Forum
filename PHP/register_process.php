@@ -17,7 +17,6 @@
     $stmt = $conn->prepare("INSERT INTO users (userID, fullName, userName, password, birthday, gender) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssss", $userID,$fullname, $username, $password, $birthday, $gender);
 
-    // Thực thi truy vấn
     $result = $stmt->execute();
 
     if ($result) {

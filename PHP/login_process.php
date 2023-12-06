@@ -1,6 +1,6 @@
 <?php
 require_once("connection.php");
-    session_start();
+session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST["username"];
     $password = $_POST["password"];
@@ -13,14 +13,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($password, $row["password"])) {
             $sql1 = "SELECT * FROM users WHERE username='$username'";
             $result1 = $conn->query($sql1);
-            $row = $result1->fetch_row();
+            //$row = $result1->fetch_row();
             $_SESSION['message'] = "Đăng nhập thành công!";
-            $_SESSION['userID'] = $row[0];
-            $isLogin = intval(true);
+            $_SESSION['userID'] = $row['userID'];
+            $isLogin = 1;
 
             $stmt = $conn->prepare("INSERT INTO personalusers (userIDpersonal, isLogin) VALUES (?, ?)");
             $stmt->bind_param("si", $_SESSION['userID'], $isLogin);
             $result3 = $stmt->execute();
+            echo '<script>
+                sessionStorage.setItem("userID", ' . json_encode($_SESSION['userID']) . ');
+            </script>';
             header("Location: forum.php?category=recently");
         } else {
             $_SESSION['message'] = "Sai mật khẩu";
@@ -30,12 +33,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else {
         $_SESSION['message'] = "Người dùng không tồn tại!";
-        $_SESSION["loginSucces"] = true;
+        $_SESSION["loginSucces"] = false;
         header("Location: index.php");
         exit();
     }
 
     $conn->close();
-    // session_destroy();
 }
 ?>

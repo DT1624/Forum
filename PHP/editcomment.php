@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Title of the document</title>
     <link rel="stylesheet" type="text/css" href="comment.css">
     <link rel="stylesheet" type="text/css" href="post.css">
+    <link rel="icon" type="png" href="uploads/uet.png">
 </head>
 
 <body style="background-color: #C6E6F2">
@@ -36,8 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script>
         function goBackPost() {
-            window.location.href = "indexCom.php?postId=<?php echo $postID; ?>";
-            exit();
+            window.history.back();
         }
     </script>
 </body>

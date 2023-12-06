@@ -37,7 +37,8 @@ session_destroy();
                 $registerType = 'block';
             }
             ?>
-            <form id="register-form" class="form" action="register.php" method="post" style="display: <?= $registerType ?>;">
+            <form id="register-form" class="form" action="register.php" method="post"
+                style="display: <?= $registerType ?>;">
                 <h1>Register</h1>
                 <label class="label" for="firstname">Firstname</label>
                 <input class="input" type="text" id="firstname" name="firstname">
@@ -49,10 +50,11 @@ session_destroy();
                 <input class="input" type="text" id="username" name="username" minlength="6" required>
 
                 <label class="label" for="password">Password</label>
-                <input class="input" type="password" id="password" name="password" required>
+                <input class="input" type="password" id="password" minlength="6" name="password" required>
 
                 <label class="label" for="birthday">Birthday</label>
-                <input class="input" type="date" id="birthday" name="birthday" max="2026-01-01" min="1950-01-01" oninput="validateYear(this)" required>
+                <input class="input" type="date" id="birthday" name="birthday" max="2026-01-01" min="1950-01-01"
+                    oninput="validateYear(this)" required>
 
                 <select id="gender" name="gender">
                     <option value="Male">Male</option>
@@ -63,8 +65,8 @@ session_destroy();
                 <br><input class="input" type="submit" value="Đăng Ký">
                 <br><button type="button" onclick="loginForm()">Switch to Login</button>
             </form>
-            <!-- style="display:none; -->
-            <form id="login-form" class="form" action="login_process.php" method="post" style="display: <?= $loginType ?>;">
+            <form id="login-form" class="form" action="login_process.php" method="post"
+                style="display: <?= $loginType ?>;">
                 <h1>Login</h1>
                 <label class="label" for="username">Username</label>
                 <input class="input" type="text" id="username" name="username" required><br>
@@ -76,13 +78,8 @@ session_destroy();
                 <br><button type="button" onclick="registerForm()">Switch to Register</button>
             </form>
         </div>
-
     </div>
 
     <script src="script.js"></script>
-    <script>
-        
-    </script>
 </body>
-
 </html>

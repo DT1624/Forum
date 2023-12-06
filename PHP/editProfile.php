@@ -43,7 +43,7 @@
                         header("Location: editProfile.php?userId=$userID");
                         exit();
                     } else {
-                        //$file = $user['linkAva'];
+                        $file = $user['linkAva'];
                         if (isset($_FILES["file"])) {
                             $file_name = $_FILES["file"]["name"];
                             $file_tmp = $_FILES["file"]["tmp_name"];
@@ -60,6 +60,7 @@
                                 $file = $target_file;
                             }
                         }
+                        if(empty($file)) $file = 'avaUser/anonymous.png';
                         $stmt = $conn->prepare("UPDATE users SET fullName = ?, password = ?, linkAva = ? WHERE userID = ?");
 
                         if (!empty($newPass)) {
@@ -70,7 +71,7 @@
                         $stmt->bind_param('ssss', $fullName, $hashedNewPass, $file, $userID);
 
                         $result = $stmt->execute();
-                        header("Location: profile.php?");
+                        header("Location: profile.php?userId=$userID");
                         exit();
                     }
                 }
@@ -87,6 +88,7 @@
     <link rel='stylesheet' type='text/css' media='screen' href='demo.css'>
     <title>Edit Profile</title>
     <link rel="stylesheet" href="editProfile.css">
+    <link rel="icon" type="png" href="uploads/uet.png">
 </head>
 <body>
     <h2>Edit profile</h2><br>
@@ -96,14 +98,14 @@
             <img id="avatar-preview" src="<?php echo $user['linkAva']; ?>" alt="Avatar Preview" style="width: 100px; height: 100px; border: 1px solid #99f; border-radius: 50%; object-fit: cover;display: flex;
             flex-direction: row;margin: 10px auto;
             align-items: center;text-align: center;"><br>
-            <label class = "label" for="fullname">Full Name</label>
-            <input class = "input" type="text" id="fullname" name="fullname" required>
-            <label class = "label" for="oldpassword">Old Password</label>
-            <input class = "input" type="password" id="oldpassword" name="oldpassword" required>
-            <label class = "label" for="password">New Password</label>
-            <input class = "input" type="password" id="newpassword" name="newpassword" required>
-            <label class = "label" for="repassword">Neww Password(re-enter)</label>
-            <input class = "input" type="password" id="repassword" name="repassword" required>
+            <label class="label" for="fullname">Full Name</label>
+            <input class="input" type="text" id="fullname" name="fullname" required>
+            <label class="label" for="oldpassword">Old Password</label>
+            <input class="input" type="password" id="oldpassword" name="oldpassword" required>
+            <label class="label" for="password">New Password</label>
+            <input class="input" type="password" id="newpassword" name="newpassword" required>
+            <label class="label" for="repassword">New Password(re-enter)</label>
+            <input class="input" type="password" id="repassword" name="repassword" required>
 
             <!-- <label for="file">Avatar<label>
             <input type="file" name="file" style="text-align: center; border: 1px solid #99f;" accept="image/*"><br> -->
@@ -114,13 +116,17 @@
             <hr>
             <button class = "input" type="submit">Update</button>
             <button onclick="goBackProfile()"> BACK</button>
+            
         </form>
     </div>
 
     <script>
         function goBackProfile() {
-            window.location.href = "profile.php";
+            window.history.back();
         }
+    </script>
+
+    <script>
         document.getElementById('file').addEventListener('change', function () {
             var preview = document.getElementById('avatar-preview');
             var fileInput = document.getElementById('file');
@@ -141,4 +147,3 @@
     </script>
 </body>
 </html>
-
