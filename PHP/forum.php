@@ -2,12 +2,16 @@
 session_start();
 require_once("connection.php");
 if (isset($_SESSION['message'])) {
-  echo "<script>alert('" . $_SESSION['message'] . "');</script>";
+  echo "<script>confirm('" . $_SESSION['message'] . "');</script>";
   unset($_SESSION['message']);
 }
 $categoryGroup = '';
 if (isset($_GET['category'])) {
   $categoryGroup = $_GET['category'];
+}
+$page = '';
+if (isset($_GET['page'])) {
+  $page = $_GET['page'];
 }
 $_SESSION['category'] = $categoryGroup;
 $userID = $_SESSION['userID'];
@@ -59,7 +63,7 @@ $userInfo = $result->fetch_assoc();
   ?>
 
   <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px" id="page-container">
-    <div class="w3-row">
+    <div class="w3-row" style="height: 800px;">
       <div class="w3-col m3">
         <div class="w3-card w3-round" style="max-width: 80%; overflow:auto; max-height: 500px;">
           <div class="w3-white">
@@ -80,24 +84,16 @@ $userInfo = $result->fetch_assoc();
         <?php
         require_once("comments.inc.php");
         require_once("connection.php");
-        getPostsForum($conn, $categoryGroup);
+        getPostsForum($conn, $categoryGroup, $page);
         ?>
         </div>
-
-        <button type="button" class="w3-button w3-theme-d1" style="padding:0 5px 0 5px;margin:1px 1px 1px 16px;display: inline-block;"> 1</button>
-        <button type="button" class="w3-button w3-theme-d1" style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 2</button>
-        <button type="button" class="w3-button w3-theme-d1" style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 3</button>
-        <button type="button" class="w3-button w3-theme-d1" style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 4</button>
-        <button type="button" class="w3-button w3-theme-d1" style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 5</button>
-        <button type="button" class="w3-button w3-theme-d1" style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 6</button>
-
       </div>
     </div>
   </div>
   <br>
 
   <footer class="w3-container w3-theme-d3 w3-padding-16">
-    <h5>Footer</h5>
+    <h5 style="text-align: right;">UET FORUM</h5>
   </footer>
   <script src="script.js"></script>
   <script src="app.js"></script>

@@ -100,11 +100,7 @@ $userInfo = $result->fetch_assoc();
 
   <!-- Footer -->
   <footer class="w3-container w3-theme-d3 w3-padding-16">
-    <h5 style="text-align: right;" ;>
-      <li>UET FORUM</li>
-      <li>ABC</li>
-    </h5>
-    <h5 style="text-align: left" ;>UET FORUM</h5>
+    <h5 style="text-align: right;">UET FORUM</h5>
   </footer>
 
   <script src="script.js"></script>

@@ -38,7 +38,7 @@
             $_SESSION['message'] = "Lỗi khi đăng bài: " . $stmt->error;
         }
         $stmt->close();
-        header("Location: forum.php?category=recently");
+        header("Location: forum.php?category=recently&page=1");
         exit();
     }
 ?>

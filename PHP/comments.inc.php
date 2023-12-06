@@ -1,16 +1,15 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
+if(session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 require_once("connection.php");
 
 //hàm xử lý đăng comment
-function setComments($conn, $postID)
-{
-    if (isset($_POST['commentSubmit'])) {
+function setComments($conn, $postID) {
+    if(isset($_POST['commentSubmit'])) {
         $userIDComment = $_SESSION['userID'];
         $comment = $_POST['comment'];
-        $commentID = 'CMT' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT);
+        $commentID = 'CMT'.str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT);
         $parent_cid = isset($_POST['parent_cid']) ? $_POST['parent_cid'] : null;
 
         //cập nhật số cmt
@@ -25,7 +24,7 @@ function setComments($conn, $postID)
         // ghi vào interact post
         $sql = "SELECT * FROM interactposts WHERE userIDInteract = '$userIDComment' AND postIDInteract = '$postID'";
         $result = $conn->query($sql);
-        if ($result->num_rows == 0) {
+        if($result->num_rows == 0) {
             $stmt = $conn->prepare("INSERT INTO interactposts (userIDInteract, postIDInteract) VALUES (?, ?)");
             $stmt->bind_param("ss", $userIDComment, $postID);
             $result = $stmt->execute();
@@ -34,12 +33,12 @@ function setComments($conn, $postID)
         $result = $conn->query($sql);
 
 
-        $noticeID = 'NO' . str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT);
+        $noticeID = 'NO'.str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT);
 
         $fullName = '';
         $fullNameQuery = "SELECT fullName FROM users WHERE userID = '$userIDComment'";
         $fullNameResult = $conn->query($fullNameQuery);
-        if ($fullNameResult->num_rows > 0) {
+        if($fullNameResult->num_rows > 0) {
             $row = $fullNameResult->fetch_assoc();
             $fullName = $row['fullName'];
         }
@@ -47,12 +46,12 @@ function setComments($conn, $postID)
         $titlePost = '';
         $titlePostQuery = "SELECT titlePost FROM posts WHERE postID = '$postID'";
         $titlePostResult = $conn->query($titlePostQuery);
-        if ($titlePostResult->num_rows > 0) {
+        if($titlePostResult->num_rows > 0) {
             $row = $titlePostResult->fetch_assoc();
             $titlePost = $row['titlePost'];
         }
 
-        $message = 'Người dùng: ' . $fullName . ' đã comment bài viết ' . $titlePost . ' của bạn.';
+        $message = 'Người dùng: '.$fullName.' đã comment bài viết '.$titlePost.' của bạn.';
 
         $userIDNotice = '';
         $userIDNoticeQuery = "
@@ -60,12 +59,12 @@ function setComments($conn, $postID)
             INNER JOIN posts p ON p.userIDPost = u.userID 
             WHERE postID = '$postID'";
         $userIDNoticeResult = $conn->query($userIDNoticeQuery);
-        if ($userIDNoticeResult->num_rows > 0) {
+        if($userIDNoticeResult->num_rows > 0) {
             $row = $userIDNoticeResult->fetch_assoc();
             $userIDNotice = $row['userID'];
         }
         //cập nhật thông báo cho người comment nếu khác chủ bài viết
-        if ($userIDNotice != $userIDComment) {
+        if($userIDNotice != $userIDComment) {
             $stmt = $conn->prepare("INSERT INTO notices (noticeID, userIDNotice, commentIDNotice, message) VALUES (?, ?, ?, ?);");
             $stmt->bind_param("ssss", $noticeID, $userIDNotice, $commentID, $message);
             $result = $stmt->execute();
@@ -77,28 +76,27 @@ function setComments($conn, $postID)
 }
 
 //hiện khung trang cá nhân bên phải profile khi truy cập profile 1 user
-function displayUserProfile($conn, $userID, $userIDNow)
-{
+function displayUserProfile($conn, $userID, $userIDNow) {
     $sql = "SELECT * FROM users WHERE userID = '$userIDNow'";
     $result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
+    if($result->num_rows > 0) {
         $userInfo = $result->fetch_assoc();
         echo "
             <div class='w3-card w3-round w3-white' >
-                <div class='w3-container' style='width:250px;'>
-                    <p class='w3-center'><img src='" . $userInfo['linkAva'] . "'style='height:150px;width:150px; border-radius: 50%; object-fit: cover;display: flex;
+                <div class='w3-container' style='width:250px; '>
+                    <p class='w3-center'><img src='".$userInfo['linkAva']."'style='height:150px;width:150px; border-radius: 50%; object-fit: cover;display: flex;
                     flex-direction: row;margin: 3rem auto;
                     align-items: center;text-align: center;' alt='Avatar'></p>
                     <hr>
-                    <p><i class='fa fa-user fa-fw w3-margin-right w3-text-theme'></i>" . $userInfo['fullName'] . "</p>
-                    <p><i class='fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme'></i>" . $userInfo['birthday'] . "</p>
-                    <p><i class='fa fa-venus-mars fa-fw w3-margin-right w3-text-theme'></i>" . $userInfo['gender'] . "</p>
-                    <p><i class='fa fa-users fa-fw w3-margin-right w3-text-theme'></i>Followers: " . $userInfo['followers'] . "</p>
+                    <p style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'><i class='fa fa-user fa-fw w3-margin-right w3-text-theme'></i>".$userInfo['fullName']."</p>
+                    <p ><i class='fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme'></i>".$userInfo['birthday']."</p>
+                    <p><i class='fa fa-venus-mars fa-fw w3-margin-right w3-text-theme'></i>".$userInfo['gender']."</p>
+                    <p><i class='fa fa-users fa-fw w3-margin-right w3-text-theme'></i>Followers: ".$userInfo['followers']."</p>
                     <p><i class='fa fa-id-card fa-fw w3-margin-right w3-text-theme'></i></p>
                 </div>
             </div>";
-        if ($userID === $userIDNow) {
+        if($userID === $userIDNow) {
             echo "<button type='button' class='w3-button w3-theme' style='margin-top: 20px; border-radius: 10%' onclick=\"editprofile('{$userID}')\">Edit profile</button>";
         }
         //echo $userID.' '.$userIDNow;
@@ -108,95 +106,93 @@ function displayUserProfile($conn, $userID, $userIDNow)
 }
 
 //load các group hiện có, có thể bấm vô để xem các bài viết theo chủ đề
-function loadGroup($conn)
-{
+function loadGroup($conn) {
     $categoryGroup = $_SESSION['category'];
-    
+
     echo '<button onclick="redirectToForum(\'recently\')" class="w3-button w3-block w3-theme-l1 w3-left-align"  style="padding: 20px;';
-            if( $categoryGroup === "recently") {
-                echo 'background-color:#A6E47C !important; color: #000000 !important';
-            }
-            echo '"><i class="fa fa-group fa-fw w3-margin-right"></i>Gần đây</button>';
+    if($categoryGroup === "recently") {
+        echo 'background-color:#A6E47C !important; color: #000000 !important';
+    }
+    echo '"><i class="fa fa-group fa-fw w3-margin-right"></i>Gần đây</button>';
     $sql = "SELECT * FROM groupss";
     $result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
-        
-        while ($row = $result->fetch_assoc()) {
-            echo '<button onclick="redirectToForum(\'' . $row['categoryGroup'] . '\')" class="w3-button w3-block w3-theme-l1 w3-left-align"  style="padding: 20px;';
+    if($result->num_rows > 0) {
+
+        while($row = $result->fetch_assoc()) {
+            echo '<button onclick="redirectToForum(\''.$row['categoryGroup'].'\')" class="w3-button w3-block w3-theme-l1 w3-left-align"  style="padding: 20px;';
             if($row['categoryGroup'] === $categoryGroup) {
                 echo 'background-color:#A6E47C !important; color: #000000 !important';
             }
-            echo '"><i class="fa fa-group fa-fw w3-margin-right"></i>' . $row['categoryGroup'] . '</button>';
+            echo '"><i class="fa fa-group fa-fw w3-margin-right"></i>'.$row['categoryGroup'].'</button>';
         }
     }
     echo
-    '<script>
+        '<script>
             function redirectToForum(categoryGroup) {
-                window.location.href = "forum.php?category=" + categoryGroup;
+                window.location.href = "forum.php?category=" + categoryGroup + "&page=1";
             }
         </script>';
 }
 
 
-function upPostForum($conn, $redirectFile)
-{
+function upPostForum($conn, $redirectFile) {
     echo
-    '<div class="w3-modal" style="align-items:center; padding-top: 50px" id="post-modal">
+        '<div class="w3-modal" style="align-items:center; padding-top: 50px" id="post-modal">
         <div class="w3-modal-content">
+            <div class="w3-container w3-padding" style="align-items:center; background-color: #F6DDCA">
+                <span class="w3-right w3-opacity">
+                    <i class="fa fa-times" onclick="closePostModal()"></i>
+                </span>
+                <form class="form1"  action="upload_post.php" method="post" enctype="multipart/form-data">
+                    <label class="label1" for="post_title"><i>Title:</i></label><br>
+                    <input style="width: 50%;" class="input1" type="text" name="post_title" placeholder="Title" required><br>
 
-        <div class="w3-container w3-padding" style="align-items:center; background-color: #F6DDCA">
-            <span class="w3-right w3-opacity">
-                <i class="fa fa-times" onclick="closePostModal()"></i>
-            </span>
-            <form class="form1"  action="upload_post.php" method="post" enctype="multipart/form-data">
-            <label class="label1" for="post_title"><i>Title:</i></label><br>
-            <input style="width: 50%;" class="input1" type="text" name="post_title" placeholder="Title" required><br>
+                    <label class="label1" for="post_description"><i>Description:</i></label><br>
+                    <textarea class="myTexttarea" style="text-align: left" id="myTextarea" name="post_description" required></textarea><br>
 
-            <label class="label1" for="post_description"><i>Description:</i></label><br>
-            <textarea class="myTexttarea" style="text-align: left" id="myTextarea" name="post_description" required></textarea><br>
-
-            <label class="label1" for="group_post" ><i>Group:</i></label><br>';
+                    <label class="label1" for="group_post" ><i>Group:</i></label><br>';
 
     require_once("connection.php");
     $sql = "SELECT groupID, categoryGroup FROM groupss";
     $result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
+    if($result->num_rows > 0) {
         echo '<select id="group" name="select_group" style="text-align:center; width: 15%; height:40px; max-height: 50px; overflow:auto;">';
 
-        while ($row = $result->fetch_assoc()) {
+        while($row = $result->fetch_assoc()) {
             $groupID = htmlspecialchars($row["groupID"]);
             $categoryGroup = htmlspecialchars($row["categoryGroup"]);
-            echo '<option value="' . $groupID . '">' . $categoryGroup . '</option>';
+            echo
+                '<option value="'.$groupID.'">'.$categoryGroup.'</option>';
         }
 
-        echo '</select>';
+        echo
+            '</select>';
     } else {
         echo "No data found";
     }
 
-    echo '<br><br><label class="label1" for="file"><i>Upload Image:<i></label><br>
-            <input class="input1" type="file" name="file" style="text-align: center;" accept="image/*"><br>
+    echo
+        '<br><br><label class="label1" for="file"><i>Upload Image:<i></label><br>
+                    <input class="input1" type="file" name="file" style="text-align: center;" accept="image/*"><br>
 
-            <button style="width: 40%" class="button1">Upload</button>
-            </form>
-        </div>
-
+                    <button style="width: 40%" class="button1">Upload</button>
+                </form>
+            </div>
         </div>
     </div>';
     echo
-    '<script>
+        '<script>
             function closePostModal() {
                 document.getElementById("post-modal").style.display = "none";
             }
         </script>';
 }
 
-function setComments2($conn)
-{
-    if (isset($_POST['commentSubmit'])) {
-        if (isset($_POST['userIDComment'], $_POST['dateOfComment'], $_POST['comment'])) {
+function setComments2($conn) {
+    if(isset($_POST['commentSubmit'])) {
+        if(isset($_POST['userIDComment'], $_POST['dateOfComment'], $_POST['comment'])) {
             $userIDComment = $_POST['userIDComment'];
             $comment = $_POST['comment'];
             $parent_cid = isset($_POST['parent_cid']) ? $_POST['parent_cid'] : null;
@@ -210,20 +206,18 @@ function setComments2($conn)
 }
 
 //hàm load Post của từng userID khi xem profile
-function getPosts($conn, $userID, $userIDNow)
-{
+function getPosts($conn, $userID, $userIDNow) {
     $sql = "SELECT * FROM posts where userIDPost = '$userIDNow' ORDER BY dateOfPost DESC";
     $result = $conn->query($sql);
 
     $posts = [];
-    while ($row = $result->fetch_assoc()) {
+    while($row = $result->fetch_assoc()) {
         $postID = $row['postID'];
 
         $imageHtml = isset($row['imagePost']) ? "<p style='text-align: center'><img class='post-image' src='{$row['imagePost']}' alt='Post Image' onclick='openModal(\"{$row['imagePost']}\", \"myModal_{$postID}\")'></p>" : '';
         echo "
-            <div class='post' id='blog-post_{$postID}' onclick='clickPost(\"{$row['postID']}\")'>";
-        if($userID == $userIDNow)
-        {
+            <div class='post' id='blog-post_{$postID}' onclick='clickPost(\"{$row['postID']}\", event)'>";
+        if($userID == $userIDNow) {
             echo "
                 <div class='post-actions' style='text-align: right; font-size: small; font-weight: 700'>
                     <button><i class='fa fa-remove'></i></button>
@@ -264,6 +258,12 @@ function getPosts($conn, $userID, $userIDNow)
     }
     echo "
             <script>
+                function clickPost(postID, event) {
+                    if (!event.target.closest('.post-image')) {
+                        window.location.href = 'indexCom.php?postId=' + postID;
+                    }
+                }
+    
                 function openModal(imageSrc, modalID) {
                     const modal = document.getElementById(modalID);
                     const modalImg = document.getElementById('modalImage_' + modalID.split('_')[1]);
@@ -297,10 +297,9 @@ function getPosts($conn, $userID, $userIDNow)
 }
 
 //hàm load bài theo group ở forum
-function getPostsForum($conn, $categoryGroup)
-{
+function getPostsForum($conn, $categoryGroup, $page) {
     $sql = "";
-    if ($categoryGroup === "search") {
+    if($categoryGroup === "search") {
         $search = $_SESSION['search'];
         $sql = "SELECT * FROM posts p
         inner join users u ON u.userID = p.userIDPost 
@@ -310,8 +309,8 @@ function getPostsForum($conn, $categoryGroup)
             OR userIDPost LIKE '%$search%' 
             OR fullName LIKE '%$search%'
         ORDER BY dateOfPost DESC";
-    } else if ($categoryGroup === "recently") {
-        $sql = "SELECT * FROM posts ORDER BY dateOfPost DESC";
+    } else if($categoryGroup === "recently") {
+        $sql = "SELECT * FROM posts ORDER BY dateOfPost DESC ";
     } else {
         $sql1 = "select * from groupss WHERE categoryGroup = '$categoryGroup'";
         $result1 = $conn->query($sql1);
@@ -321,8 +320,20 @@ function getPostsForum($conn, $categoryGroup)
         $sql = "SELECT * FROM posts WHERE groupIDPost = '$groupID' ORDER BY dateOfPost DESC";
     }
     $result = $conn->query($sql);
+    $posts = [];
+    while($row = $result->fetch_assoc()) {
+        $posts[] = $row;
+    }
 
-    while ($row = $result->fetch_assoc()) {
+    $postsPerPage = 5;
+    $totalPosts = $result->num_rows;
+    $totalPages = ceil($totalPosts / $postsPerPage);
+    $startIndex = ($page - 1) * $postsPerPage;
+    $sql .= " LIMIT $startIndex, $postsPerPage";
+
+    $result = $conn->query($sql);
+
+    while($row = $result->fetch_assoc()) {
         $postID = $row['postID'];
         $userID = $row['userIDPost'];
         $sql1 = "select * from users WHERE userID = '$userID'";
@@ -336,11 +347,11 @@ function getPostsForum($conn, $categoryGroup)
                     </div>
 
                     <p style='text-align: right; font-size: small; font-weight: 700'><i>{$row['dateOfPost']}</i></p>
-                    <a href='profile.php?userId=" . $row['userIDPost'] . "' style='text-overflow: ellipsis;text-decoration:none;'>
+                    <a href='profile.php?userId=".$row['userIDPost']."' style='text-overflow: ellipsis;text-decoration:none;'>
                         <div class='comment-container' style='display: flex; align-items: center;'>
                             <img src='{$row1['linkAva']}' class='w3-circle' style='height:60px;width:60px;border-radius: 50%; object-fit: cover; margin-right: 10px;' alt='Avatar'>
                             <div style='text-align: left;'>     
-                                <span class='user-name'>" . $row1['fullName'] . "</span><br>
+                                <span class='user-name'>".$row1['fullName']."</span><br>
                             </div>
                         </div>
                     </a>
@@ -360,15 +371,27 @@ function getPostsForum($conn, $categoryGroup)
                 </div>
             ";
     }
+
+    for ($i = max(1, $page - 2); $i <= min(max(1, $page - 2) + 5, $totalPages); $i++) {
+        echo '<a href="?category=' . $categoryGroup . '&page=' . $i . '" class="w3-button w3-theme-d1" style="padding:0 10px 0 5px;margin:1px 2px 5px 5px ;display: inline-block;';
+        if($i == $page) echo 'background-color: #F66B37 !important; color: #000000 !important;';
+        echo '">' . $i . '</a>';
+    }
+
+    echo "
+        <script>
+        function clickPost(postID) {
+            window.location.href = 'indexCom.php?postId=' + postID;
+        }
+    </script>";
 }
 
 //hàm load tất cả comment của bài viết
-function getComments($conn, $userID, $postID)
-{
+function getComments($conn, $userID, $postID) {
     $sql = "SELECT * FROM comments WHERE postIDComment = '$postID' order by dateOfComment DESC";
     $result = $conn->query($sql);
-    while ($row = $result->fetch_assoc()) {
-        $sql1 = "SELECT * FROM users WHERE userID = \"" . $row['userIDComment'] . "\"";
+    while($row = $result->fetch_assoc()) {
+        $sql1 = "SELECT * FROM users WHERE userID = \"".$row['userIDComment']."\"";
         $result1 = $conn->query($sql1);
         $row1 = $result1->fetch_assoc();
         echo "
@@ -410,42 +433,41 @@ function getComments($conn, $userID, $postID)
 
         echo "  
                     <form class='reply-form' method='POST' action='replyComment.php'> 
-                        <input type='hidden' name='parent_cid' value='" . $row['commentID'] . "'>
-                        <input type='hidden' name='userIDComment' value='" . $row['userIDComment'] . "'> 
-                        <input type='hidden' name='postIDComment' value='" . $row['postIDComment'] . "'>
+                        <input type='hidden' name='parent_cid' value='".$row['commentID']."'>
+                        <input type='hidden' name='userIDComment' value='".$row['userIDComment']."'> 
+                        <input type='hidden' name='postIDComment' value='".$row['postIDComment']."'>
                         <button type='submit' name='replyComment'>Reply</button>
-                    </form>";   
-                    
-        if ($userID == $row['userIDComment']) {
+                    </form>";
+
+        if($userID == $row['userIDComment']) {
             echo "
                 
-                    <form class='edit-form' method='POST' action='editcomment.php?commentId=" . $row['commentID'] . "'> 
-                        <input type='hidden' name='commentID' value='" . $row['commentID'] . "'>
-                        <input type='hidden' name='userIDComment' value='" . $row['userIDComment'] . "'>
-                        <input type='hidden' name='postIDComment' value='" . $row['postIDComment'] . "'>
-                        <input type='hidden' name='comment' value='" . $row['comment'] . "'>
+                    <form class='edit-form' method='POST' action='editcomment.php?commentId=".$row['commentID']."'> 
+                        <input type='hidden' name='commentID' value='".$row['commentID']."'>
+                        <input type='hidden' name='userIDComment' value='".$row['userIDComment']."'>
+                        <input type='hidden' name='postIDComment' value='".$row['postIDComment']."'>
+                        <input type='hidden' name='comment' value='".$row['comment']."'>
                         <button>Edit</button>
                     </form> 
                     
-                    <form class='delete-form' method='POST' action='indexCom.php?postId=" . $row['postIDComment'] . "&id=3'> 
-                        <input type='hidden' name='commentID' value='" . $row['commentID'] . "'>
-                        <input type='hidden' name='postIDComment' value='" . $row['postIDComment'] . "'>
+                    <form class='delete-form' method='POST' action='indexCom.php?postId=".$row['postIDComment']."&id=3'> 
+                        <input type='hidden' name='commentID' value='".$row['commentID']."'>
+                        <input type='hidden' name='postIDComment' value='".$row['postIDComment']."'>
                         <button type = 'submit' name = 'commentDelete'>Delete</button>
                     </form>
                     ";
         }
-        echo 
-                "</div>
+        echo
+            "</div>
             </div>";
 
-        echo 
+        echo
             "<hr style='border-width: 10px; border-color:#037937;'><hr>";
     }
 }
 
 //hàm xử lý khi nhấn nút delete
-function deleteComments($conn, $userID, $postID, $commentID)
-{
+function deleteComments($conn, $userID, $postID, $commentID) {
     //xóa cmt thì xóa cả cmt tỏng post, trong notice về user, trong comments, trong interactposts
     $sql = "UPDATE posts SET numberComments = greatest(numberComments - 1, 0) WHERE postID = '$postID'";
     $result = $conn->query($sql);
@@ -461,21 +483,20 @@ function deleteComments($conn, $userID, $postID, $commentID)
     exit();
 }
 
-function replyComment($conn)
-{
-    if (isset($_POST['replyComment'])) {
+function replyComment($conn) {
+    if(isset($_POST['replyComment'])) {
         $parent_cid = $_POST['parent_cid'];
         $userIDComment = $_POST['userIDComment'];
         $comment = $_POST['comment'];
 
-        if (empty($comment)) {
+        if(empty($comment)) {
             header("Location: replyComment.php?error=emptymessage&parent_cid=$parent_cid");
             exit();
         }
         $sql = "INSERT INTO comments (userIDComment, comment, parent_cid) VALUES ($userIDComment, $comment, $parent_cid)";
         $stmt = $conn->prepare($sql);
 
-        if ($stmt) {
+        if($stmt) {
             $stmt->bind_param("sssi", $userIDComment, $comment, $parent_cid);
             $stmt->execute();
             $stmt->close();
@@ -488,16 +509,15 @@ function replyComment($conn)
     }
 }
 
-function displayMenu($conn, $userID)
-{
+function displayMenu($conn, $userID) {
     $sql = "SELECT * FROM users WHERE userID = '$userID'";
     $result = $conn->query($sql);
     $userInfo = $result->fetch_assoc();
     echo
-    '
+        '
         <div class="w3-top" >
             <div class="w3-bar w3-theme-d2 w3-left-align w3-large" style="height:51px">
-            <a href="forum.php?category=recently" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Logo</a>
+            <a href="forum.php?category=recently&page=1" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Logo</a>
             <a onclick="openPostModal()" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Messages"><i class="fa fa-pencil"></i></a>
 
             <div class="w3-dropdown-hover w3-hide-small">
@@ -515,12 +535,12 @@ function displayMenu($conn, $userID)
                 </input>
             </form>
 
-            <a href="profile.php?userId=' . $userID . '" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" style="height:51px" title="My Account" onclick="clickProfile()">
-                <img src="' . $userInfo['linkAva'] . '" style="height:23px;width:23px;border-radius: 50%; object-fit: cover;display: flex;
+            <a href="profile.php?userId='.$userID.'" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" style="height:51px" title="My Account" onclick="clickProfile()">
+                <img src="'.$userInfo['linkAva'].'" style="height:23px;width:23px;border-radius: 50%; object-fit: cover;display: flex;
                 flex-direction: row; align-items: center;text-align: center;" alt="Avatar">
             </a>
 
-            <a href="logout.php?userId=' . $userID . '" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white w3-right">Sign out<i class="fa fa-sign-out"></i></a>
+            <a href="logout.php?userId='.$userID.'" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white w3-right">Sign out<i class="fa fa-sign-out"></i></a>
             </div>
         </div>
         ';

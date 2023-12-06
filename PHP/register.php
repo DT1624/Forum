@@ -1,10 +1,29 @@
 <?php
-session_start();
+    session_start();
 
-$userName = str_replace(' ', '', $_POST['username']);
-$password = $_POST['password'];
-
+if (isset($_SESSION['message'])) {
+    echo "<script>alert('" . $_SESSION['message'] . "');</script>";
+    unset($_SESSION['message']); // Xóa thông báo sau khi sử dụng
+}
+    $userName = str_replace(' ', '', $_POST['username']);
+    $password = $_POST['password'];
+    if(strlen($userName) < 6) {
+        $_SESSION['message'] = "Tên đăng nhập yêu cầu tối thiểu 6 ký tự.";
+        echo "<script>registerForm();</script>";
+        header("Location: index.php");
+        exit();
+    }
+    if(strlen($password) < 6) {
+        $_SESSION['message'] = "Mật khẩu cần ít nhất 6 ký tự.";
+        echo "<script>registerForm();</script>";
+        header("Location: index.php");
+        exit();
+    }
+    
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
     require_once("connection.php");
     $_SESSION['username'] = $_POST['username'];
     $_SESSION['password'] = $_POST['password'];
@@ -17,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
-        $_SESSION['message'] = "Tên đăng nhập đã tồn tại, vui lòng chọn tên khác";
+        $_SESSION['message'] = "Tên đăng nhập đã tồn tại";
         echo "<script>registerForm();</script>";
         header("Location: index.php");
         exit();
