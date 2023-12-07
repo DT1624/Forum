@@ -68,10 +68,19 @@ if ($_SERVER['REQUEST_METHOD'] ==='POST') {
         $sql = "UPDATE interactposts SET isComment = isComment + 1 WHERE userIDInteract = '$userID' AND postIDInteract = '$postID'";
         $result = $conn->query($sql);
 
-        //ghi vào bảng notice
+        //ghi vào bảng notice (reply)
         $noticeID = 'NO'.str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT);
         $fullName = $row1['fullName'];
+        $message = 'Người dùng: '.$fullName.' đã reply một comment của bạn.';
+        if($userIDNotice != $userID) {
+            $stmt = $conn->prepare("INSERT INTO notices (noticeID, userIDNotice, userIDDo, postIDNotice, commentIDNotice, message) VALUES (?, ?, ?, ?, ?, ?);");
+            $stmt->bind_param("ssssss", $noticeID, $userIDNotice, $userID, $postID, $commentID, $message);
+            $result = $stmt->execute();
+        }
+        //ghi vào bảng notice(cmt trong post)
+        $noticeID = 'NO'.str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT);
         $titlePost = $post['titlePost'];
+        $userIDNotice = $userIDPost;
         $message = 'Người dùng: '.$fullName.' đã comment bài viết '.$titlePost.' của bạn.';
         if($userIDNotice != $userID) {
             $stmt = $conn->prepare("INSERT INTO notices (noticeID, userIDNotice, userIDDo, postIDNotice, commentIDNotice, message) VALUES (?, ?, ?, ?, ?, ?);");

@@ -471,35 +471,52 @@ function displayMenu($conn, $userID) {
     $sql = "SELECT * FROM users WHERE userID = '$userID'";
     $result = $conn->query($sql);
     $userInfo = $result->fetch_assoc();
+    $numberNotice = 5;
+    $sql1 = "SELECT * FROM notices WHERE userIDNotice = '$userID' AND userIDDo is not null AND statusReadNotice = 0 ORDER BY dateOfNotice desc";
+    $result2 = $conn->query($sql1);
+    $sql1 .= " LIMIT $numberNotice";
+    $result1 = $conn->query($sql1);
     echo
         '
         <div class="w3-top" >
-            <div class="w3-bar w3-theme-d2 w3-left-align w3-large" style="height:51px">
-            <a href="forum.php?category=recently&page=1" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Logo</a>
-            <a onclick="openPostModal()" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Messages"><i class="fa fa-pencil"></i></a>
+            <div class="w3-bar w3-theme-d2 w3-left-align w3-large" style="height:51px !important">
+                <a href="forum.php?category=recently&page=1" class="w3-bar-item w3-button w3-padding-large w3-theme-d4" style="height:51px !important"><i class="fa fa-home w3-margin-right">Home</i></a>
+                <a onclick="openPostModal()" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Messages" style="height:51px !important"><i class="fa fa-pencil"></i></a>
 
-            <div class="w3-dropdown-hover w3-hide-small">
-                <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green">3</span></button>
-                <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:300px">
-                <a href="#" class="w3-bar-item w3-button">One new friend request</a>
-                <a href="#" class="w3-bar-item w3-button">John Doe posted on your wall</a>
-                <a href="#" class="w3-bar-item w3-button">Jane likes your post</a>
+                <div class="w3-dropdown-hover w3-hide-small" style="height:51px !important">
+                    <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green">';
+                    if($result2->num_rows > 0) echo $result2->num_rows;
+                    echo '</span></button>
+                    <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:300px">';
+                    if($result1->num_rows > 0) {
+                        while($notice = $result1->fetch_assoc()) {
+                            if ($notice['postIDNotice'] !== null) {
+                                echo '<a href="handle_post_notice.php?postId='.$notice['postIDNotice'].'&noticeId='.$notice['noticeID'].'" class="w3-bar-item w3-button" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 500px;">'. $notice['message'] .'</a>';
+                            } else if ($notice['userIDDo'] !== null) {
+                                echo '<a href="handle_user_notice.php?userId='.$notice['userIDNotice'].'&noticeId='.$notice['noticeID'].'" class="w3-bar-item w3-button" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 500px;">'. $notice['message'] .'</a>';
+                            }
+                        }
+                    } else {
+                        echo '<a href="#" class="w3-bar-item w3-button">No notifications</a>';
+                    }                
+        echo        
+                    '</div>
                 </div>
-            </div>
 
-            <form class="w3-margin-left w3-bar-item" action="search.php" method="post">
-                <input class="" type="text" placeholder="Search.." name="search" id="search-inp" required>
-                <button class="" type="submit"><i class="fa fa-search"></i></button>
-                </input>
-            </form>
+                <form class="w3-margin-left w3-bar-item" action="search.php" method="post" style="height:51px !important">
+                    <input class="" type="text" placeholder="Search.." name="search" id="search-inp" required>
+                    <button class="" type="submit"><i class="fa fa-search"></i></button>
+                    </input>
+                </form>
 
-            <a href="profile.php?userId='.$userID.'" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" style="height:51px" title="My Account" onclick="clickProfile()">
-                <img src="'.$userInfo['linkAva'].'" style="height:23px;width:23px;border-radius: 50%; object-fit: cover;display: flex;
-                flex-direction: row; align-items: center;text-align: center;" alt="Avatar">
-            </a>
+                <a href="profile.php?userId='.$userID.'" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" style="height:51px" title="My Account" onclick="clickProfile()">
+                    <img src="'.$userInfo['linkAva'].'" style="height:23px;width:23px;border-radius: 50%; object-fit: cover;display: flex;
+                    flex-direction: row; align-items: center;text-align: center;" alt="Avatar">
+                </a>
 
-            <a href="logout.php?userId='.$userID.'" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white w3-right" >Sign out<i class="fa fa-sign-out"></i></a>
+                <a href="logout.php?userId='.$userID.'" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white w3-right" ><i class="fa fa-sign-out">Sign out</i></a>
             </div>
         </div>
         ';
 }
+

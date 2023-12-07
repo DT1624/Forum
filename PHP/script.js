@@ -46,6 +46,7 @@ function clickLogo() {
     window.location.href = "forum.php?category=recently";
 }
 
+
 // function clickPost(postID) {
 //     window.location.href = "indexCom.php?postId=" + postID;
 // }
