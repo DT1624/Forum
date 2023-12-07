@@ -34,6 +34,28 @@
 
         if ($result) {
             $_SESSION['message'] = "Đăng bài thành công!";
+
+            //gửi thông báo cho các followers về việc đăng bài
+            $sql = "SELECT * FROM interactusers WHERE userIDInteracted = '$userIDPost' AND isFollow = 1";
+            $ans = $conn->query($sql);
+            while($row = $ans->fetch_assoc()) {
+                $noticeID = 'NO' . str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT);
+                $userIDNotice = $row['userIDInteracting'];
+                $userIDDo = $userIDPost;
+                $postIDNotice = $postID;
+
+                $ans1 = "SELECT * FROM users WHERE userID = '$userIDDo'";
+                $re1 = $conn->query($ans1);
+                $row1 = $re1->fetch_assoc();
+                $fullName = $row1['fullName'];
+
+                $message = "Người dùng ". $fullName . " đã đăng một bài viết mới";
+                if ($userIDNotice != $userID) {
+                    $stmt = $conn->prepare("INSERT INTO notices (noticeID, userIDNotice, userIDDO, postIDNotice, message) VALUES (?, ?, ?, ?, ?);");
+                    $stmt->bind_param("sssss", $noticeID, $userIDNotice, $userIDDo, $postIDNotice, $message);
+                    $stmt->execute();
+                }
+            }
         } else {
             $_SESSION['message'] = "Lỗi khi đăng bài: " . $stmt->error;
         }

@@ -88,8 +88,29 @@ function displayUserProfile($conn, $userID, $userIDNow) {
                 <div class='w3-container' style='width:250px; '>
                     <p class='w3-center'><img src='".$userInfo['linkAva']."'style='height:150px;width:150px; border-radius: 50%; object-fit: cover;display: flex;
                     flex-direction: row;margin: 3rem auto;
-                    align-items: center;text-align: center;' alt='Avatar'></p>
-                    <hr>
+                    align-items: center;text-align: center;' alt='Avatar'></p>";
+        
+        if($userID !== $userIDNow) {
+            echo "
+                    <div style='text-align: center;'>
+                        <a href='followUser.php?userId=".$userID."&userIDNow=".$userIDNow."' class='post-actions' style='font-size: small; font-weight: 700;'>
+                            <button style='border: 2px solid; background-color: 
+            ";
+            $sql = "SELECT * FROM interactusers WHERE userIDInteracting = '$userID' AND userIDInteracted = '$userIDNow' AND isFollow = 1";
+            $result = $conn->query($sql);
+            if($result->num_rows > 0) {
+                echo "#ffff00";
+            } else {
+                echo "#ffffff";
+            }
+            echo "
+                        !important '><i class='fa fa-bell' ></i></button>
+                        </a>
+                    </div>
+            ";
+        }           
+                    
+        echo "           
                     <p style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'><i class='fa fa-id-card fa-fw w3-margin-right w3-text-theme'></i>".$userInfo['fullName']."</p>
                     <p ><i class='fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme'></i>".$userInfo['birthday']."</p>
                     <p><i class='fa fa-venus-mars fa-fw w3-margin-right w3-text-theme'></i>".$userInfo['gender']."</p>
@@ -109,7 +130,8 @@ function displayUserProfile($conn, $userID, $userIDNow) {
 function loadGroup($conn) {
     $categoryGroup = $_SESSION['category'];
 
-    echo '<button onclick="redirectToForum(\'recently\')" class="w3-button w3-block w3-theme-l1 w3-left-align"  style="padding: 20px;';
+    echo '
+        <button onclick="redirectToForum(\'recently\')" class="w3-button w3-block w3-theme-l1 w3-left-align"  style="padding: 20px;';
     if($categoryGroup === "recently") {
         echo 'background-color:#A6E47C !important; color: #000000 !important';
     }
@@ -118,9 +140,9 @@ function loadGroup($conn) {
     $result = $conn->query($sql);
 
     if($result->num_rows > 0) {
-
         while($row = $result->fetch_assoc()) {
-            echo '<button onclick="redirectToForum(\''.$row['categoryGroup'].'\')" class="w3-button w3-block w3-theme-l1 w3-left-align"  style="padding: 20px;';
+            echo '
+                <button onclick="redirectToForum(\''.$row['categoryGroup'].'\')" class="w3-button w3-block w3-theme-l1 w3-left-align"  style="padding: 20px;';
             if($row['categoryGroup'] === $categoryGroup) {
                 echo 'background-color:#A6E47C !important; color: #000000 !important';
             }
@@ -137,53 +159,54 @@ function loadGroup($conn) {
 
 
 function upPostForum($conn, $redirectFile) {
-    echo
-        '<div class="w3-modal" style="align-items:center; padding-top: 50px" id="post-modal">
-        <div class="w3-modal-content">
-            <div class="w3-container w3-padding" style="align-items:center; background-color: #F6DDCA">
-                <span class="w3-right w3-opacity">
-                    <i class="fa fa-times" onclick="closePostModal()"></i>
-                </span>
-                <form class="form1"  action="upload_post.php" method="post" enctype="multipart/form-data">
-                    <label class="label1" for="post_title"><i>Title:</i></label><br>
-                    <input style="width: 50%;" class="input1" type="text" name="post_title" placeholder="Title" required><br>
+    echo '
+        <div class="w3-modal" style="align-items:center; padding-top: 50px" id="post-modal">
+            <div class="w3-modal-content">
+                <div class="w3-container w3-padding" style="align-items:center; background-color: #F6DDCA">
+                    <span class="w3-right w3-opacity">
+                        <i class="fa fa-times" onclick="closePostModal()"></i>
+                    </span>
 
-                    <label class="label1" for="post_description"><i>Description:</i></label><br>
-                    <textarea class="myTexttarea" style="text-align: left" id="myTextarea" name="post_description" required></textarea><br>
+                    <form class="form1"  action="upload_post.php" method="post" enctype="multipart/form-data">
+                        <label class="label1" for="post_title"><i>Title:</i></label><br>
+                        <input style="width: 50%;" class="input1" type="text" name="post_title" placeholder="Title" required><br>
 
-                    <label class="label1" for="group_post" ><i>Group:</i></label><br>';
+                        <label class="label1" for="post_description"><i>Description:</i></label><br>
+                        <textarea class="myTexttarea" style="text-align: left" id="myTextarea" name="post_description" required></textarea><br>
+
+                        <label class="label1" for="group_post" ><i>Group:</i></label><br>';
 
     require_once("connection.php");
     $sql = "SELECT groupID, categoryGroup FROM groupss";
     $result = $conn->query($sql);
 
     if($result->num_rows > 0) {
-        echo '<select id="group" name="select_group" style="text-align:center; width: 15%; height:40px; max-height: 50px; overflow:auto;">';
+        echo '
+                        <select id="group" name="select_group" style="text-align:center; width: 15%; height:40px; max-height: 50px; overflow:auto;">';
 
         while($row = $result->fetch_assoc()) {
             $groupID = htmlspecialchars($row["groupID"]);
             $categoryGroup = htmlspecialchars($row["categoryGroup"]);
-            echo
-                '<option value="'.$groupID.'">'.$categoryGroup.'</option>';
+            echo '
+                            <option value="'.$groupID.'">'.$categoryGroup.'</option>';
         }
 
-        echo
-            '</select>';
+        echo '
+                        </select>';
     } else {
         echo "No data found";
     }
-
-    echo
-        '<br><br><label class="label1" for="file"><i>Upload Image:<i></label><br>
-                    <input class="input1" type="file" name="file" style="text-align: center;" accept="image/*"><br>
-
-                    <button style="width: 40%" class="button1">Upload</button>
-                </form>
+    echo '  
+                        <br><br>
+                        <label class="label1" for="file"><i>Upload Image:<i></label><br>                  
+                        <input class="input1" type="file" name="file" style="text-align: center;" accept="image/*"><br>
+                        <button style="width: 40%" class="button1">Upload</button>
+                    </form>
+                </div>
             </div>
-        </div>
-    </div>';
-    echo
-        '<script>
+        </div>';
+    echo'
+        <script>
             function closePostModal() {
                 document.getElementById("post-modal").style.display = "none";
             }
@@ -191,6 +214,7 @@ function upPostForum($conn, $redirectFile) {
 }
 
 //hàm load Post của từng userID khi xem profile
+
 function getPosts($conn, $userID, $userIDNow) {
     $sql = "SELECT * FROM posts where userIDPost = '$userIDNow' ORDER BY dateOfPost DESC";
     $result = $conn->query($sql);
@@ -204,8 +228,10 @@ function getPosts($conn, $userID, $userIDNow) {
             <div class='post' id='blog-post_{$postID}' onclick='clickPost(\"{$row['postID']}\", event)'>";
         if($userID == $userIDNow) {
             echo "
-                <div class='post-actions' style='text-align: right; font-size: small; font-weight: 700'>
-                    <button><i class='fa fa-remove'></i></button>
+                <div style='text-align: right;'>
+                    <a href='confirmDelete.php?postId=".$postID."&userId=".$userID."' class='post-actions' style='font-size: small; font-weight: 700;'>
+                        <button><i class='fa fa-remove'></i></button>
+                    </a>
                 </div>";
         } else {
             echo "
@@ -218,7 +244,7 @@ function getPosts($conn, $userID, $userIDNow) {
                 <h1><i>{$row['titlePost']}<i></h1>";
         echo $imageHtml;
         echo "
-                <div class='description-container'>
+                <div class='description-container' style='height: auto; max-height: 300px; resize:none; overflow-y: auto;'>
                     <p>{$row['descriptionPost']}</p>
                 </div>
                 <br>
@@ -242,6 +268,15 @@ function getPosts($conn, $userID, $userIDNow) {
         ";
     }
     echo "
+            <script> 
+            function confirmDelete(postID, userID, event) {
+                if(window.confirm('Bạn có chắc chắn muốn xóa bài viết này')) {
+                    window.location.href = 'a.php?postId=' + postID;
+                } else {
+                    window.location.href = 'profile.php?userId=' + userID;
+                }
+            }
+            </script>
             <script>
                 function clickPost(postID, event) {
                     if (!event.target.closest('.post-image')) {
@@ -272,7 +307,7 @@ function getPosts($conn, $userID, $userIDNow) {
                 function outsideClick(event, modalID) {
                     const modal = document.getElementById(modalID);
                     const closeBtn = document.getElementById('closeBtn_' + modalID.split('_')[1]);
-        
+                    
                     if (event.target === modal || event.target === closeBtn) {
                         modal.style.display = 'none';
                     }
@@ -280,6 +315,14 @@ function getPosts($conn, $userID, $userIDNow) {
             </script>
         ";
 }
+// function confirmDelete(postID, userID) {
+//     if(window.confirm('Bạn có chắc chắn muốn xóa bài viết này') {
+//         window.location.href = 'a.php?postId='+ postID;
+//     } else {
+//         window.location.href = 'profile.php?userId='+ userID;
+//     }
+
+// }
 
 //hàm load bài theo group ở forum
 function getPostsForum($conn, $categoryGroup, $page) {
@@ -342,7 +385,7 @@ function getPostsForum($conn, $categoryGroup, $page) {
                     </a>
                     <h1><i>{$row['titlePost']}<i></h1>";
         echo "
-                    <div class='description-container'>
+                    <div class='description-container' style='height: auto; max-height: 300px; resize:none; overflow-y: auto;'>
                         <p>{$row['descriptionPost']}</p>
                     </div>
                     <br>
@@ -380,10 +423,9 @@ function getComments($conn, $userID, $postID) {
         $result1 = $conn->query($sql1);
         $row1 = $result1->fetch_assoc();
         echo "
-            <div>";
-        echo "
-            <div> 
-                <p style='text-align: right; font-size: small; font-weight: 600'><i>{$row['dateOfComment']}</i></p>
+            <div>
+                <div> 
+                    <p style='text-align: right; font-size: small; font-weight: 600'><i>{$row['dateOfComment']}</i></p>
                     <a href='profile.php?userId={$row['userIDComment']}' style='text-decoration:none'>
                         <div class='comment-container' style='display: flex; align-items: center;'>
                             <img src='{$row1['linkAva']}' class='w3-circle' style='height:50px;width:50px; object-fit: cover; border-radius: 50%;margin-right: 10px;' alt='Avatar'>
@@ -392,30 +434,13 @@ function getComments($conn, $userID, $postID) {
                             </div>
                         </div>
                     </a>
-                    </div>
-                    <br>
-                    <div class='comment-box' style='height: auto; max-height: 300px; resize:none; overflow-y: auto;'>
-                <p>";
-        // echo "
-        //         <div> 
-        //             <p style='text-align: right; font-size: small; font-weight: 600'><i>" . $row['dateOfComment'] . "</i></p>
-        //             <a href='profile.php?userId=" . $row['userIDComment'] . "' style='text-decoration:none'>
-        //                 <div class='comment-container' style='display: flex; align-items: center;'>
-        //                     <img src=" . $row1['linkAva'] . " class='w3-circle' style='height:50px;width:auto;border-radius: 50%;margin-right: 10px;' alt='Avatar'>
-        //                     <div style='text-align: left;'> 
+                </div>
+                 <br>       
+                <div class='comment-box' style='height: auto; max-height: 300px; resize:none; overflow-y: auto;'>
+                    ".nl2br($row['comment'])."
+                </div>
 
-        //                         <span class='user-name'>" . $row1['fullName'] . "</span><br>
-        //                     </div>
-        //                 </div>
-        //             </a>
-        //         </div>
-        //         <br>
-        //         <div class='comment-box'
-        //         style='height: auto; max-height: 300px; resize:none; overflow-y: auto;'><p>";
-        echo nl2br($row['comment']);
-        echo "</div>
-                <div style='display: flex; justify-content: space-between;'>";
-        echo "  
+                <div style='display: flex; justify-content: space-between;'> 
                     <form class='reply-form' method='POST' action='replyComment.php'> 
                         <input type='hidden' name='repCommentID' value='".$row['commentID']."'>
                         <input type='hidden' name='userIDComment' value='".$row['userIDComment']."'> 
@@ -442,11 +467,10 @@ function getComments($conn, $userID, $postID) {
                     ";
         }
         echo
-            "</div>
-            </div>";
-
-        echo
-            "<hr style='border-width: 10px; border-color:#037937;'><hr>";
+                "</div>
+            </div>
+            
+            <hr style='border-width: 10px; border-color:#037937;'><hr>";
     }
 }
 
@@ -485,22 +509,26 @@ function displayMenu($conn, $userID) {
 
                 <div class="w3-dropdown-hover w3-hide-small" style="height:51px !important">
                     <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green">';
-                    if($result2->num_rows > 0) echo $result2->num_rows;
-                    echo '</span></button>
+    if($result2->num_rows > 0) echo $result2->num_rows;
+    echo '
+                    </span></button>
                     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:300px">';
-                    if($result1->num_rows > 0) {
-                        while($notice = $result1->fetch_assoc()) {
-                            if ($notice['postIDNotice'] !== null) {
-                                echo '<a href="handle_post_notice.php?postId='.$notice['postIDNotice'].'&noticeId='.$notice['noticeID'].'" class="w3-bar-item w3-button" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 500px;">'. $notice['message'] .'</a>';
-                            } else if ($notice['userIDDo'] !== null) {
-                                echo '<a href="handle_user_notice.php?userId='.$notice['userIDNotice'].'&noticeId='.$notice['noticeID'].'" class="w3-bar-item w3-button" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 500px;">'. $notice['message'] .'</a>';
-                            }
-                        }
-                    } else {
-                        echo '<a href="#" class="w3-bar-item w3-button">No notifications</a>';
-                    }                
-        echo        
-                    '</div>
+    if($result1->num_rows > 0) {
+        while($notice = $result1->fetch_assoc()) {
+            if ($notice['postIDNotice'] !== null) {
+                echo '
+                        <a href="handle_post_notice.php?postId='.$notice['postIDNotice'].'&noticeId='.$notice['noticeID'].'" class="w3-bar-item w3-button" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 500px;">'. $notice['message'] .'</a>';
+            } else if ($notice['userIDDo'] !== null) {
+                echo '
+                        <a href="handle_user_notice.php?userId='.$notice['userIDDo'].'&noticeId='.$notice['noticeID'].'" class="w3-bar-item w3-button" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 500px;">'. $notice['message'] .'</a>';
+            }
+        }
+    } else {
+        echo '
+                        <a href="#" class="w3-bar-item w3-button">No notifications</a>';
+    }                
+    echo '        
+                    </div>
                 </div>
 
                 <form class="w3-margin-left w3-bar-item" action="search.php" method="post" style="height:51px !important">

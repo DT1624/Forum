@@ -55,7 +55,7 @@ $userInfo = $result->fetch_assoc();
 
   <!-- Page Container -->
   <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px">
-    <div class="w3-row">
+    <div class="w3-row" style="height: 600px;">
       <!-- hiển thị thông tin user bên trái -->
       <div class="w3-col m3" style="display: flex;
                                     flex-direction: column;
@@ -78,23 +78,8 @@ $userInfo = $result->fetch_assoc();
         getPosts($conn, $userID, $userIDNow);
         ?>
 
-        <button type="button" class="w3-button w3-theme-d1"
-          style="padding:0 5px 0 5px;margin:1px 1px 1px 16px;display: inline-block;"> 1</button>
-        <button type="button" class="w3-button w3-theme-d1"
-          style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 2</button>
-        <button type="button" class="w3-button w3-theme-d1"
-          style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 3</button>
-        <button type="button" class="w3-button w3-theme-d1"
-          style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 4</button>
-        <button type="button" class="w3-button w3-theme-d1"
-          style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 5</button>
-        <button type="button" class="w3-button w3-theme-d1"
-          style="padding:0 5px 0 5px;margin:1px;display: inline-block;"> 6</button>
-
       </div>
-
     </div>
-
   </div>
   <br>
 

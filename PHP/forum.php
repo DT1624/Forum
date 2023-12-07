@@ -63,7 +63,7 @@ $userInfo = $result->fetch_assoc();
   ?>
 
   <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px" id="page-container">
-    <div class="w3-row" style="height: 800px;">
+    <div class="w3-row" style="height: 600px;">
       <div class="w3-col m3">
         <div class="w3-card w3-round" style="max-width: 80%; overflow:auto; max-height: 500px;">
           <div class="w3-white">

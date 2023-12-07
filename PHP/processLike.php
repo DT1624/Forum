@@ -56,9 +56,6 @@ if($row['isLike'] == 0) {
         $stmt->bind_param("sssssi", $noticeID, $userIDNotice, $userID, $postID, $message, $like);
         $result = $stmt->execute();
     }
-
-
-
 } else {
     // xóa like cần cập nhật cả trong interactposts, posts và notices
     $sql = "UPDATE interactposts SET isLike = 1 - isLike WHERE userIDInteract = '$userID' AND postIDInteract = '$postID'";

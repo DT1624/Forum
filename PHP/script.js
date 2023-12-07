@@ -46,6 +46,14 @@ function clickLogo() {
     window.location.href = "forum.php?category=recently";
 }
 
+function confirmDelete(postID, userID) {
+    if(window.confirm('Bạn có chắc chắn muốn xóa bài viết này')) {
+        window.location.href = 'a.php?postId='+ postID;
+    } else {
+        window.location.href = 'profile.php?userId='+ userID;
+    }
+
+}
 
 // function clickPost(postID) {
 //     window.location.href = "indexCom.php?postId=" + postID;

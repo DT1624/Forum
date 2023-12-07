@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] ==='POST') {
             <p style="text-align: right; font-size: small; font-weight: 600"><i><?php echo $post['dateOfPost']; ?></i></p>
             <h1 style="text-align: left; margin: 0px 50px 0px 50px"><i><?php echo $post['titlePost']; ?></i></h1>
             <?php echo $imageHtml; ?>
-            <div class='description-container'>
+            <div class='description-container' style='height: auto; max-height: 400px; resize:none; overflow-y: auto;'>
                 <p><?php echo $post['descriptionPost']; ?></p>
             </div>
         </div>
