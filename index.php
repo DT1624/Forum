@@ -50,7 +50,7 @@ session_destroy();
                 <input class="input" type="text" id="username" name="username" minlength="6" required>
 
                 <label class="label" for="password">Password</label>
-                <input class="input" type="password" id="password" name="password" required>
+                <input class="input" type="password" id="password" minlength="6" name="password" required>
 
                 <label class="label" for="birthday">Birthday</label>
                 <input class="input" type="date" id="birthday" name="birthday" max="2026-01-01" min="1950-01-01"

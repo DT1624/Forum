@@ -137,3 +137,7 @@ hr {
   
 
 
+.w3-button.active {
+    background-color: #98f133;
+    color: #ddd;
+}

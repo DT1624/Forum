@@ -1,19 +1,20 @@
 <?php
+session_start();
 require_once("connection.php");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $commentID = $_POST['commentID'];
-    $comment = $_POST['comment'];
-    $postID = $_POST['postIDComment'];
-    //editComments($conn, $commentID, $comment);
-    //header("Location: indexCom.php?postId=$postID");
-    // exit();
+    $repCommentID = $_POST['repCommentID'];
+    $userIDComment = $_POST['userIDComment'];
+    $postIDComment = $_POST['postIDComment'];
 }
+//echo $repCommentID. ' ' . $userIDComment. ' '.$postIDComment;
+$commentID = 'CMT'.str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT);
 
 ?>
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Title of the document</title>
@@ -23,12 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body style="background-color: #C6E6F2">
-    <h1 style="text-align: center; color: darkmagenta">EDIT COMMENT</h1>
+    <h1 style="text-align: center; color: darkmagenta">REP COMMENT</h1>
     <div id="comments-section">
-        <form method='POST' action='indexCom.php?postId=<?php echo $postID ?>&id=1'>
+        <form method='POST' action='indexCom.php?postId=<?php echo $postIDComment; ?>&id=4'>
+            <input type='hidden' name='repCommentID' value='<?php echo $repCommentID; ?>'>
+            <input type='hidden' name='userIDComment' value='<?php echo $userIDComment; ?>'>
             <input type='hidden' name='commentID' value='<?php echo $commentID; ?>'>
-            <textarea name='comment' required><?php echo $comment ?></textarea><br>
-            <button type='submit' name='editComment'>Update Comment</button>
+            <textarea name='comment' required></textarea><br>
+            <button type='submit' name='replyComment'>Reply</button>
         </form>
         <button type='submit' onclick="goBackPost()"> BACK</button>
         <hr>
@@ -40,4 +43,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </script>
 </body>
+
 </html>
