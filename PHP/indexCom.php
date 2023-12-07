@@ -22,11 +22,11 @@ $sqlPost = "SELECT * FROM posts WHERE postID = '$postID'";
 $resultPost = $conn->query($sqlPost);
 // Kiểm tra xem có bài viết nào hay không
 if ($resultPost->num_rows > 0) {
-    $post = $resultPost->fetch_assoc();
+    $post = $resultPost->fetch_assoc();//bài viết hiện tại
     $userIDPost = $post['userIDPost'];
     $sql1 = "select * from users WHERE userID = '$userIDPost'";
     $result1 = $conn->query($sql1);
-    $row1 = $result1->fetch_assoc();
+    $row1 = $result1->fetch_assoc();//thông tin về user hiện tại
 }
 
 
@@ -43,6 +43,41 @@ if ($_SERVER['REQUEST_METHOD'] ==='POST') {
         setComments($conn, $postID);
     } else if($id == '3') {
         deleteComments($conn, $userID, $postID, $commentID);
+    } else if($id == '4') {
+        $comment = $_POST['comment'];
+        $repCommentID = $_POST['repCommentID'];
+        $userIDNotice = $_POST['userIDComment'];//user sẽ nhận tbao
+
+        //cập nhật bảng posts
+        $sql = "UPDATE posts SET numberComments = numberComments + 1 WHERE postID = '$postID'";
+        $result = $conn->query($sql);
+
+        //insert vào bảng cmt
+        $stmt = $conn->prepare("INSERT INTO comments (commentID, userIDComment, postIDComment, repCommentID, comment) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $commentID, $userID, $postID, $repCommentID, $comment);
+        $result = $stmt->execute();
+
+        // ghi vào interact post
+        $sql = "SELECT * FROM interactposts WHERE userIDInteract = '$userID' AND postIDInteract = '$postID'";
+        $result = $conn->query($sql);
+        if($result->num_rows == 0) {
+            $stmt = $conn->prepare("INSERT INTO interactposts (userIDInteract, postIDInteract) VALUES (?, ?)");
+            $stmt->bind_param("ss", $userID, $postID);
+            $result = $stmt->execute();
+        }
+        $sql = "UPDATE interactposts SET isComment = isComment + 1 WHERE userIDInteract = '$userID' AND postIDInteract = '$postID'";
+        $result = $conn->query($sql);
+
+        //ghi vào bảng notice
+        $noticeID = 'NO'.str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT);
+        $fullName = $row1['fullName'];
+        $titlePost = $post['titlePost'];
+        $message = 'Người dùng: '.$fullName.' đã comment bài viết '.$titlePost.' của bạn.';
+        if($userIDNotice != $userID) {
+            $stmt = $conn->prepare("INSERT INTO notices (noticeID, userIDNotice, userIDDo, postIDNotice, commentIDNotice, message) VALUES (?, ?, ?, ?, ?, ?);");
+            $stmt->bind_param("ssssss", $noticeID, $userIDNotice, $userID, $postID, $commentID, $message);
+            $result = $stmt->execute();
+        }
     }
     header("Location: indexCom.php?postId=$postID");
     exit();
@@ -112,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] ==='POST') {
     <script src="app.js"></script>
     <script>
         function goBackForum() {
-            window.history.back();
+            window.location.href = "forum.php?category=recently&page=1";
         }
     </script> 
 </body>

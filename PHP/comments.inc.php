@@ -10,7 +10,6 @@ function setComments($conn, $postID) {
         $userIDComment = $_SESSION['userID'];
         $comment = $_POST['comment'];
         $commentID = 'CMT'.str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT);
-        $parent_cid = isset($_POST['parent_cid']) ? $_POST['parent_cid'] : null;
 
         //cập nhật số cmt
         $sql = "UPDATE posts SET numberComments = numberComments + 1 WHERE postID = '$postID'";
@@ -36,11 +35,13 @@ function setComments($conn, $postID) {
         $noticeID = 'NO'.str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT);
 
         $fullName = '';
-        $fullNameQuery = "SELECT fullName FROM users WHERE userID = '$userIDComment'";
+        $userID = '';
+        $fullNameQuery = "SELECT * FROM users WHERE userID = '$userIDComment'";
         $fullNameResult = $conn->query($fullNameQuery);
         if($fullNameResult->num_rows > 0) {
             $row = $fullNameResult->fetch_assoc();
             $fullName = $row['fullName'];
+            $userID = $row['userID'];
         }
 
         $titlePost = '';
@@ -65,8 +66,8 @@ function setComments($conn, $postID) {
         }
         //cập nhật thông báo cho người comment nếu khác chủ bài viết
         if($userIDNotice != $userIDComment) {
-            $stmt = $conn->prepare("INSERT INTO notices (noticeID, userIDNotice, commentIDNotice, message) VALUES (?, ?, ?, ?);");
-            $stmt->bind_param("ssss", $noticeID, $userIDNotice, $commentID, $message);
+            $stmt = $conn->prepare("INSERT INTO notices (noticeID, userIDNotice, userIDDo, postIDNotice, commentIDNotice, message) VALUES (?, ?, ?, ?, ?, ?);");
+            $stmt->bind_param("ssssss", $noticeID, $userIDNotice, $userID, $postID, $commentID, $message);
             $result = $stmt->execute();
         }
 
@@ -89,11 +90,10 @@ function displayUserProfile($conn, $userID, $userIDNow) {
                     flex-direction: row;margin: 3rem auto;
                     align-items: center;text-align: center;' alt='Avatar'></p>
                     <hr>
-                    <p style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'><i class='fa fa-user fa-fw w3-margin-right w3-text-theme'></i>".$userInfo['fullName']."</p>
+                    <p style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'><i class='fa fa-id-card fa-fw w3-margin-right w3-text-theme'></i>".$userInfo['fullName']."</p>
                     <p ><i class='fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme'></i>".$userInfo['birthday']."</p>
                     <p><i class='fa fa-venus-mars fa-fw w3-margin-right w3-text-theme'></i>".$userInfo['gender']."</p>
                     <p><i class='fa fa-users fa-fw w3-margin-right w3-text-theme'></i>Followers: ".$userInfo['followers']."</p>
-                    <p><i class='fa fa-id-card fa-fw w3-margin-right w3-text-theme'></i></p>
                 </div>
             </div>";
         if($userID === $userIDNow) {
@@ -188,21 +188,6 @@ function upPostForum($conn, $redirectFile) {
                 document.getElementById("post-modal").style.display = "none";
             }
         </script>';
-}
-
-function setComments2($conn) {
-    if(isset($_POST['commentSubmit'])) {
-        if(isset($_POST['userIDComment'], $_POST['dateOfComment'], $_POST['comment'])) {
-            $userIDComment = $_POST['userIDComment'];
-            $comment = $_POST['comment'];
-            $parent_cid = isset($_POST['parent_cid']) ? $_POST['parent_cid'] : null;
-            $sql = "INSERT INTO comments (userIDComment, comment, parent_cid) VALUES ($userIDComment, $comment, $parent_cid)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param('sssi', $userIDComment, $comment, $parent_cid);
-            $result = $stmt->execute();
-            $stmt->close();
-        }
-    }
 }
 
 //hàm load Post của từng userID khi xem profile
@@ -430,10 +415,9 @@ function getComments($conn, $userID, $postID) {
         echo nl2br($row['comment']);
         echo "</div>
                 <div style='display: flex; justify-content: space-between;'>";
-
         echo "  
                     <form class='reply-form' method='POST' action='replyComment.php'> 
-                        <input type='hidden' name='parent_cid' value='".$row['commentID']."'>
+                        <input type='hidden' name='repCommentID' value='".$row['commentID']."'>
                         <input type='hidden' name='userIDComment' value='".$row['userIDComment']."'> 
                         <input type='hidden' name='postIDComment' value='".$row['postIDComment']."'>
                         <button type='submit' name='replyComment'>Reply</button>
@@ -483,32 +467,6 @@ function deleteComments($conn, $userID, $postID, $commentID) {
     exit();
 }
 
-function replyComment($conn) {
-    if(isset($_POST['replyComment'])) {
-        $parent_cid = $_POST['parent_cid'];
-        $userIDComment = $_POST['userIDComment'];
-        $comment = $_POST['comment'];
-
-        if(empty($comment)) {
-            header("Location: replyComment.php?error=emptymessage&parent_cid=$parent_cid");
-            exit();
-        }
-        $sql = "INSERT INTO comments (userIDComment, comment, parent_cid) VALUES ($userIDComment, $comment, $parent_cid)";
-        $stmt = $conn->prepare($sql);
-
-        if($stmt) {
-            $stmt->bind_param("sssi", $userIDComment, $comment, $parent_cid);
-            $stmt->execute();
-            $stmt->close();
-            header("Location: indexCom.php");
-            exit();
-        } else {
-            header("Location: replyComment.php?error=sqlerror&parent_cid=$parent_cid");
-            exit();
-        }
-    }
-}
-
 function displayMenu($conn, $userID) {
     $sql = "SELECT * FROM users WHERE userID = '$userID'";
     $result = $conn->query($sql);
@@ -540,7 +498,7 @@ function displayMenu($conn, $userID) {
                 flex-direction: row; align-items: center;text-align: center;" alt="Avatar">
             </a>
 
-            <a href="logout.php?userId='.$userID.'" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white w3-right">Sign out<i class="fa fa-sign-out"></i></a>
+            <a href="logout.php?userId='.$userID.'" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white w3-right" >Sign out<i class="fa fa-sign-out"></i></a>
             </div>
         </div>
         ';

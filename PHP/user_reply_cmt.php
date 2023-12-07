@@ -13,21 +13,6 @@
     $result = $stmt->execute();
     //chèn dữ liệu vào bảng interactposts
 
-    `SET @repCommentID = '2',
-    @userIDComment = 'ID03307499';
-    Set @postIDComment = (select postIDComment from comments
-    where commentID = @repCommentID);
-    set @userName = (select fullName from users where userID = @userIDComment);
-    Select @userIDNotice = userID,
-        @tittlePost = tittlePost
-     from users u	
-    inner join posts p ON p.userIDPost = u.userID 
-    where postID = @postIDComment;
-    insert into interactposts (userIDInteract, postIDInteract, isComment) VALUES (@userIDComment, @postIDComment, true);
-    SET @message = CONCAT_WS(' ', @userName, 'đã comment bài viết', @tittlePost, 'của bạn');
-    INSERT INTO notices (noticeID, userIDNotice, message) VALUES ('000001', @userIDNotice, @message);
-    INSERT INTO comments (commentID, userIDComment, postIDComment, repCommentID, comment) VALUES (8888, @userIDComment, @postIDComment, @repCommentID, @message);`;
-
     $updateNumberCmt = "UPDATE posts SET numberComments = numberComments + 1 WHERE postID = '$postID'";
     mysqli_query($conn, $updateNumberCmt) or die('Error!');
 

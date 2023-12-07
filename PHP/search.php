@@ -7,6 +7,6 @@ if ($_SERVER['REQUEST_METHOD'] ==='POST') {
     //echo $_SESSION['search'];
 
 
-    header("Location: forum.php?category=search");
+    header("Location: forum.php?category=search&page=1");
 }    
 ?>
